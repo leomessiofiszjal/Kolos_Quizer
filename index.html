@@ -8,11 +8,11 @@
     <meta charset="UTF-8">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-LYWBPREM5N"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-    
-      gtag('config', 'G-LYWBPREM5N');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-LYWBPREM5N');
     </script>
     <style>
         @media only screen and (max-width: 1080px) {
@@ -83,8 +83,16 @@
         var numberofQuestions = 0;
 
         const questions = [
-            { question: "Źródłami prawa powszechnie obowiązującego w Polsce są", options: ["a) tylko Konsytutcja i ustawy", "*b) tylko Konstytyucja, ustawy i ratyfikowane umowy międzynarodowe", "c) tylko ratyfikowane umowy międzynarodowe"], reason: "Tak po prostu jest, żyjemy w Polsce :)" },
-            { question: "W Polsce w razie kolizji przepisów ratyfikowanej umowy międzynarodowej i ustawy:", options: ["a) pierwszeństwo mają przepisy ustawy", "*b) pierwszeństwo mają przepisy umowy międzynarodowej", "c) o pierwszeństwie decyduje MATERIA przepisu ustawy i umowy międzynarodowej"], reason: "Art. 91. Konstytucji mówi, że Umowa międzynarodowa ratyfikowana za uprzednią zgodą wyrażoną w ustawie ma pierwszeństwo przed ustawą, jeżeli ustawy tej nie da się pogodzić z umową." },
+            {
+                question: "Źródłami prawa powszechnie obowiązującego w Polsce są",
+                options: ["a) tylko Konsytutcja i ustawy", "b) tylko Konstytyucja, ustawy i ratyfikowane umowy międzynarodowe", "*c) Konstytyucja, ustawy i ratyfikowane umowy międzynarodowe oraz rozporządzenia"],
+                reason: "Art. 87. Źródłami powszechnie obowiązującego prawa Rzeczypospolitej Polskiej są: Konstytucja, ustawy, ratyfikowane umowy międzynarodowe oraz rozporządzenia"
+            },
+            {
+                question: "W Polsce w razie kolizji przepisów ratyfikowanej umowy międzynarodowej i ustawy:",
+                options: ["a) pierwszeństwo mają przepisy ustawy", "*b) pierwszeństwo mają przepisy umowy międzynarodowej", "c) o pierwszeństwie decyduje MATERIA przepisu ustawy i umowy międzynarodowej"],
+                reason: "Art. 91. Konstytucji mówi, że Umowa międzynarodowa ratyfikowana za uprzednią zgodą wyrażoną w ustawie ma pierwszeństwo przed ustawą, jeżeli ustawy tej nie da się pogodzić z umową."
+            },
             {
                 question: "Relacje między władzą ustawodawczą i sądowniczą w Polsce oparte są na zasadzie",
                 options: ["a) nadrzędności władzy ustawodawczej", "b) nadrzędności władzy sądowniczej", "*c) odrębności i niezależności władzy sądowniczej od władzy ustawodawczej"],
@@ -148,7 +156,7 @@
             {
                 question: "W sądowym postępowaniu egzekucyjnym tytułem egzekucyjnym może być",
                 options: ["a) tylko prawomocne orzeczenie sądu", "b) tylko prawomocne orzeczenie sądu i ostateczna decyzja administracyjna", "*c) nie tylko prawomocne orzeczenie sądu i ostateczna decyzja administracyjna"],
-                reason: "W sądowym postępowaniu egzekucyjnym tytułem egzekucyjnym może być zarówno prawomocne orzeczenie sądu, jak i ostateczna decyzja administracyjna."
+                reason: "Zgodnie z art. 777 Kodeksu postępowania cywilnego, tytułem egzekucyjnym może być każdy dokument, z którego wynika roszczenie egzekucyjne. Oznacza to, że egzekucji można poddać nie tylko prawomocne orzeczenia sądów i ostateczne decyzje administracyjne, ale również inne dokumenty, o ile spełniają określone warunki."
             },
             {
                 question: "Egzekucja należności prywatno-prawnych może być prowadzona",
@@ -167,8 +175,8 @@
             },
             {
                 question: "Podmiotami prawa są",
-                options: ["a) spółki handlowe i spółki cywilne", "b) spółki cywilne i spółdzielnie", "*c) spółki cywilne i handlowe"],
-                reason: "Podmiotami prawa są różne formy spółek, w tym cywilne i handlowe."
+                options: ["a) tylko spółki handlowe", "b) tylko spółki cywilne i spółdzielnie", "*c) m.in. spółki cywilne i handlowe"],
+                reason: "Podmiotami prawa są osoby fizyczne oraz różne formy spółek, w tym cywilne i handlowe."
             },
             {
                 question: "Osobami prawnymi są jednostki organizacyjne",
@@ -183,12 +191,7 @@
             {
                 question: "Przedsiębiorcą w rozumieniu kodeksu cywilnego jest",
                 options: ["a) tylko prowadzący działalność gospodarczą", "*b) prowadzący działalność gospodarczą lub zawodową", "c) tylko prowadzący działalność zawodową"],
-                reason: "Przedsiębiorcą w rozumieniu kodeksu cywilnego jest osoba prowadząca działalność gospodarczą lub zawodową."
-            },
-            {
-                question: "Przedsiębiorcą w rozumieniu kodeksu cywilnego jest",
-                options: ["a) wspólnik spółki cywilnej prowadzącej działalność gospodarczą", "*b) wspólnik spółki jawnej prowadzącej działalność gospodarczą", "c) komplementariusz spółki partnerskiej prowadzącej działalność gospodarczą"],
-                reason: "Przedsiębiorcą jest wspólnik spółki jawnej prowadzącej działalność gospodarczą."
+                reason: "Kodeks cywilny (art. 431 KC) definiuje przedsiębiorcę jako osobę fizyczną, osobę prawną i jednostkę organizacyjną prowadzącą we własnym imieniu działalność gospodarczą lub zawodową. Spółka jawna jest typem spółki handlowej, w której wszyscy wspólnicy ponoszą solidarną odpowiedzialność za zobowiązania spółki, zarówno całym swoim majątkiem osobistym, jak i wkładem do spółki. Oznacza to, że każdy wspólnik spółki jawnej prowadzącej działalność gospodarczą jest automatycznie uznawany za przedsiębiorcę w rozumieniu Kodeksu cywilnego."
             },
             {
                 question: "Prowadzący działalność gospodarczą jest przedsiębiorcą",
@@ -197,8 +200,8 @@
             },
             {
                 question: "Komandytariusz w spółce komandytowej",
-                options: ["a) odpowiada za jej zobowiązania subsydiarnie w sposób ograniczony", "*b) odpowiada za jej zobowiązania subsydiarnie w sposób nieograniczony", "c) nie odpowiada za jej zobowiązania"],
-                reason: "Komandytariusz w spółce komandytowej odpowiada za jej zobowiązania subsydiarnie w sposób nieograniczony."
+                options: ["*a) odpowiada za jej zobowiązania subsydiarnie w sposób ograniczony", "b) odpowiada za jej zobowiązania subsydiarnie w sposób nieograniczony", "c) nie odpowiada za jej zobowiązania"],
+                reason: "Komandytariusz w spółce komandytowej odpowiada za jej zobowiązania subsydiarnie i w ograniczonym zakresie. Oznacza to, że wierzyciele spółki mogą dochodzić zaspokojenia swoich roszczeń z majątku komandytariusza dopiero wówczas, gdy egzekucja z majątku spółki okaże się nieskuteczna. Dodatkowo, odpowiedzialność komandytariusza jest ograniczona do wysokości sumy komandytowej. Suma komandytowa to kwota, którą komandytariusz zobowiązał się wnieść do spółki. Informacja o sumie komandytowej jest jawna i udostępniona w rejestrze przedsiębiorców."
             },
             {
                 question: "Obowiązkowi wpisu do rejestru przedsiębiorców w Krajowym Rejestrze Sądowym",
@@ -212,18 +215,18 @@
             },
             {
                 question: "Obowiązkowi prowadzenia ksiąg rachunkowych:",
-                options: ["a) podlegają wszystkie spółki komandytowe,", "b) nie podlegają wszystkie spółki komandytowo-akcyjne,", "*c) podlegają nie wszystkie spółki komandytowe."],
-                reason: "Nie wszystkie spółki komandytowe podlegają obowiązkowi prowadzenia ksiąg rachunkowych."
+                options: ["a) podlegają wszystkie spółki komandytowe,", "*b) nie podlegają wszystkie spółki komandytowo-akcyjne,", "c) podlegają nie wszystkie spółki komandytowe."],
+                reason: "Każda spółka komandytowa, niezależnie od tego jakie osiąga przychody i kto jest w niej wspólnikami, musi więc prowadzić księgi rachunkowe. Nie wszystkie spółki komandytowo-akcyjne podlegają obowiązkowi prowadzenia ksiąg rachunkowych. Często zależy to od wielkości spółki i skali jej działalności. W niektórych przypadkach, mniejsze spółki komandytowo-akcyjne mogą być zwolnione z tego obowiązku."
             },
             {
                 question: "Spółkę partnerską charakteryzuje:",
-                options: ["a) brak ograniczeń podmiotowych w odniesieniu do wspólników (partnerów) tej spółki,", "*b) solidarna i subsydiarna odpowiedzialność wspólników (partnerów) za niektóre zobowiązania spółki,", "c) solidarna i subsydiarna odpowiedzialność wspólników (partnerów) za wszystkie zobowiązania spółki."],
-                reason: "Spółka partnerska charakteryzuje się solidarną i subsydiarną odpowiedzialnością wspólników za niektóre zobowiązania spółki."
+                options: ["a) brak ograniczeń podmiotowych w odniesieniu do wspólników (partnerów) tej spółki,", "b) solidarna i subsydiarna odpowiedzialność wspólników (partnerów) za niektóre zobowiązania spółki,", "*c) solidarna i subsydiarna odpowiedzialność wspólników (partnerów) za wszystkie zobowiązania spółki."],
+                reason: "Każdy wspólnik odpowiada za zobowiązania spółki bez ograniczenia całym swoim majątkiem solidarnie z pozostałymi wspólnikami oraz ze spółką. Wierzyciel spółki może prowadzić egzekucję z majątku wspólnika w przypadku, gdy egzekucja z majątku spółki okaże się bezskuteczna (subsydiarna odpowiedzialność wspólnika)."
             },
             {
                 question: "Spółka komandytowo-akcyjna jest spółką zawiązaną w celu prowadzenia przedsiębiorstwa, w której:",
                 options: ["a) przynajmniej jeden wspólnik za jej zobowiązania odpowiada całym swoim majątkiem,", "*b) odpowiedzialność przynajmniej jednego wspólnika jest ograniczona,", "c) przynajmniej jeden wspólnik za jej zobowiązania odpowiada całym swoim majątkiem, a odpowiedzialność przynajmniej jednego wspólnika jest wyłączona."],
-                reason: "Spółka komandytowo-akcyjna charakteryzuje się tym, że odpowiedzialność przynajmniej jednego wspólnika jest ograniczona."
+                reason: "Spółka komandytowo-akcyjna jest typem spółki, w której wyróżniamy dwa rodzaje wspólników -> Komplementariusz: odpowiada za zobowiązania spółki bez ograniczenia całym swoim majątkiem osobistym, Akcjonariusz: odpowiada za zobowiązania spółki tylko do wysokości wniesionego wkładu. Oznacza to, że w spółce komandytowo-akcyjnej musi być co najmniej jeden komplementariusz, który ponosi nieograniczoną odpowiedzialność za długi spółki, oraz co najmniej jeden akcjonariusz, którego odpowiedzialność jest ograniczona."
             },
             {
                 question: "Spółka z ograniczoną odpowiedzialnością może być zawiązana przez:",
@@ -247,8 +250,8 @@
             },
             {
                 question: "Dopuszczalne jest ogłoszenie upadłości:",
-                options: ["*a) gmin, powiatów i województw,", "b) Skarbu Państwa,", "c) osoby fizycznej wykonującej wolny zawód."],
-                reason: "Dopuszczalne jest ogłoszenie upadłości gmin, powiatów i województw."
+                options: ["a) gmin, powiatów i województw,", "b) Skarbu Państwa,", "*c) osoby fizycznej wykonującej wolny zawód."],
+                reason: "Z podanych odpowiedzi poprawna jest tylko jedna: Dopuszczalne jest ogłoszenie upadłości osoby fizycznej wykonującej wolny zawód. Skarb Państwa oraz gminy, powiaty i województwa nie mogą zostać ogłoszone upadłymi."
             },
             {
                 question: "Prawo własności intelektualnej podlega pod:",
