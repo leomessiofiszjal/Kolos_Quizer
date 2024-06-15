@@ -1,0 +1,518 @@
+ <!DOCTYPE html>
+<html lang="pl" data-bs-theme="dark">
+
+<head>
+    <title>Mikro Modelarstwo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LYWBPREM5N"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-LYWBPREM5N');
+    </script>
+    <style>
+        @media only screen and (max-width: 1080px) {
+            .main {
+                padding: 16px;
+                width: 100%;
+            }
+
+            .questionContainer {
+            }
+
+            .testMain {
+                padding: 16px;
+                width: 100%;
+            }
+        }
+
+        @media only screen and (min-width: 1080px) {
+            .main {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100vh;
+            }
+
+            .questionContainer {
+                width: 30vw;
+            }
+
+            .testMain {
+                padding: 32px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                overflow: auto;
+                width: 100%;
+                height: 100vh;
+            }
+        }
+
+        p {
+            font-weight: bold;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="main" id="main">
+        <div id="selectMode" class="text-center">
+            <img width="80%"
+                src="https://i.imgur.com/jOtYssK.jpg">
+            <h1>Mikro-Maksymalizacja Sukcesów Dydaktyczno-Modelarskich</h1>
+            <button class="btn btn-secondary" onclick="learn()">Ucz mnie szefie</button>
+            <button class="btn btn-secondary" onclick="test()">Testuj mnie dajesz</button>
+        </div>
+        <div id="modeDiv">
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script>
+        var questionNumberArray = [];
+        var randomQuestionId = 0;
+        var lastWrongAnsweredId = -1;
+        var numberofQuestions = 0;
+
+        const questions = [
+            {
+                "question": "Co to jest linia budżetowa?",
+                "options": [
+                    "a) Linia przedstawiająca maksymalny zysk przedsiębiorstwa",
+                    "*b) Linia pokazująca wszystkie możliwe kombinacje dóbr, które konsument może nabyć, biorąc pod uwagę jego dochód i ceny dóbr",
+                    "c) Linia obrazująca wzrost gospodarczy kraju",
+                    "d) Linia reprezentująca zmiany cen na rynku"
+                ],
+                "reason": "Linia budżetowa ilustruje możliwe kombinacje dóbr, które konsument może kupić przy danym dochodzie i cenach."
+            },
+            {
+                "question": "Oblicz nachylenie linii budżetowej, jeśli cena dobra X wynosi 3 zł, a cena dobra Y wynosi 6 zł.",
+                "options": [
+                    "a) -2",
+                    "b) -0.5",
+                    "c) -1",
+                    "*d) -3"
+                ],
+                "reason": "Nachylenie linii budżetowej jest obliczane jako stosunek cen dwóch dóbr, czyli - (cena X / cena Y) = - (3/6) = -0.5."
+            },
+            {
+                "question": "W jaki sposób zmienia się optymalny wybór konsumenta, gdy wzrasta jego dochód?",
+                "options": [
+                    "a) Konsument wybiera tańsze dobra",
+                    "*b) Linia budżetowa przesuwa się w górę, co umożliwia wybór kombinacji dóbr leżących na wyższej krzywej obojętności",
+                    "c) Konsument rezygnuje z konsumpcji dóbr luksusowych",
+                    "d) Linia budżetowa przesuwa się w dół"
+                ],
+                "reason": "Wzrost dochodu przesuwa linię budżetową w górę, pozwalając konsumentowi na wybór lepszych kombinacji dóbr."
+            },
+            {
+                "question": "Czym jest prawo malejącej użyteczności krańcowej?",
+                "options": [
+                    "a) Prawo mówiące o stałej wartości krańcowej użyteczności",
+                    "*b) Prawo opisujące zmniejszanie się satysfakcji z każdej kolejnej jednostki konsumowanego dobra",
+                    "c) Prawo dotyczące wzrostu użyteczności całkowitej",
+                    "d) Prawo określające wartość pieniężną dóbr"
+                ],
+                "reason": "Prawo malejącej użyteczności krańcowej mówi, że każda kolejna jednostka konsumowanego dobra dostarcza coraz mniej satysfakcji."
+            },
+            {
+                "question": "Jeśli konsument zwiększa konsumpcję dobra z 3 do 4 jednostek, a użyteczność całkowita wzrasta z 15 do 18, jaka jest krańcowa użyteczność tej jednostki dobra?",
+                "options": [
+                    "*a) 3",
+                    "b) 18",
+                    "c) 15",
+                    "d) 4"
+                ],
+                "reason": "Krańcowa użyteczność to zmiana w użyteczności całkowitej podzielona przez zmianę w ilości konsumowanego dobra: (18 - 15) / (4 - 3) = 3."
+            },
+            {
+                "question": "Jakie jest zastosowanie prawa malejącej użyteczności krańcowej w modelach ekonomicznych?",
+                "options": [
+                    "a) Do przewidywania wzrostu gospodarczego",
+                    "*b) Do analizy optymalizacji budżetu konsumenta",
+                    "c) Do określania maksymalnej ceny dóbr",
+                    "d) Do badania wpływu polityki fiskalnej na konsumpcję"
+                ],
+                "reason": "Prawo malejącej użyteczności krańcowej pomaga w analizie, jak konsumenci optymalizują swoje decyzje zakupowe w ramach ograniczonego budżetu."
+            },
+            {
+                "question": "Co to jest niedobór rynkowy?",
+                "options": [
+                    "a) Sytuacja, w której podaż przewyższa popyt",
+                    "*b) Ilość towaru, o którą popyt przekracza podaż przy określonej cenie",
+                    "c) Nadwyżka produktów na rynku",
+                    "d) Brak konkurencji na rynku"
+                ],
+                "reason": "Niedobór rynkowy to sytuacja, w której popyt na dane dobro przewyższa jego podaż przy danej cenie."
+            },
+            {
+                "question": "Jeżeli przy cenie 10 zł popyt wynosi 100 jednostek, a podaż 70 jednostek, jaki jest niedobór rynkowy?",
+                "options": [
+                    "a) 10 jednostek",
+                    "*b) 30 jednostek",
+                    "c) 70 jednostek",
+                    "d) 100 jednostek"
+                ],
+                "reason": "Niedobór rynkowy to różnica między popytem a podażą, czyli 100 jednostek - 70 jednostek = 30 jednostek."
+            },
+            {
+                "question": "Jakie są konsekwencje niedoboru rynkowego dla rynku?",
+                "options": [
+                    "a) Spadek cen dóbr",
+                    "*b) Wzrost cen dóbr",
+                    "c) Zmniejszenie produkcji",
+                    "d) Zwiększenie podaży dóbr"
+                ],
+                "reason": "Niedobór rynkowy prowadzi do wzrostu cen, ponieważ popyt przewyższa podaż."
+            },
+            {
+                "question": "Co reprezentuje krzywa możliwości produkcyjnych?",
+                "options": [
+                    "a) Możliwości eksportowe kraju",
+                    "*b) Maksymalną kombinację dóbr, które mogą być wyprodukowane przy pełnym wykorzystaniu zasobów",
+                    "c) Krzywą przedstawiającą dochód narodowy",
+                    "d) Krzywą ilustrującą wzrost inflacji"
+                ],
+                "reason": "Krzywa możliwości produkcyjnych ilustruje maksymalne kombinacje dóbr, które mogą być wyprodukowane przy pełnym wykorzystaniu dostępnych zasobów."
+            },
+            {
+                "question": "Jeżeli gospodarka produkuje maksymalnie 50 jednostek dobra A i 100 jednostek dobra B, co reprezentuje punkt znajdujący się wewnątrz krzywej możliwości produkcyjnych?",
+                "options": [
+                    "a) Pełne wykorzystanie zasobów",
+                    "*b) Niewykorzystane zasoby",
+                    "c) Niemożliwą kombinację produkcji",
+                    "d) Nadprodukcję dóbr"
+                ],
+                "reason": "Punkt znajdujący się wewnątrz krzywej możliwości produkcyjnych wskazuje na niewykorzystane zasoby lub niewydajność produkcji."
+            },
+            {
+                "question": "Jakie czynniki mogą przesunąć krzywą możliwości produkcyjnych na zewnątrz?",
+                "options": [
+                    "*a) Wzrost zasobów i postęp technologiczny",
+                    "b) Spadek zasobów",
+                    "c) Zmniejszenie liczby ludności",
+                    "d) Wprowadzenie restrykcji handlowych"
+                ],
+                "reason": "Krzywa możliwości produkcyjnych może przesunąć się na zewnątrz w wyniku wzrostu zasobów i postępu technologicznego, co zwiększa potencjał produkcyjny."
+            },
+            {
+                "question": "Co zalicza się do czynników produkcji?",
+                "options": [
+                    "a) Tylko zasoby naturalne",
+                    "*b) Zasoby naturalne, kapitał, praca i przedsiębiorczość",
+                    "c) Tylko praca",
+                    "d) Tylko kapitał"
+                ],
+                "reason": "Czynniki produkcji obejmują zasoby naturalne, kapitał, pracę i przedsiębiorczość, które są niezbędne do produkcji dóbr i usług."
+            },
+            {
+                "question": "Jeżeli kapitał wynosi 200 jednostek, a praca 50 jednostek, jaka jest wydajność jednego pracownika?",
+                "options": [
+                    "*a) 4 jednostki",
+                    "b) 5 jednostki",
+                    "c) 50 jednostek",
+                    "d) 200 jednostek"
+                ],
+                "reason": "Wydajność jednego pracownika jest obliczana jako stosunek kapitału do pracy: 200 jednostek / 50 jednostek = 4 jednostki."
+            },
+            {
+                "question": "Jakie znaczenie ma efektywne wykorzystanie czynników produkcji w gospodarce?",
+                "options": [
+                    "a) Zwiększa koszty produkcji",
+                    "b) Zmniejsza produktywność",
+                    "*c) Prowadzi do wzrostu gospodarczego",
+                    "d) Powoduje stagnację gospodarczą"
+                ],
+                "reason": "Efektywne wykorzystanie czynników produkcji prowadzi do wzrostu gospodarczego poprzez zwiększenie wydajności i produkcji."
+            },
+            {
+                "question": "Co charakteryzuje rynek wolnej konkurencji?",
+                "options": [
+                    "*a) Duża liczba sprzedających i kupujących, jednorodność produktów, doskonała informacja rynkowa",
+                    "b) Monopol jednego sprzedającego",
+                    "c) Mała liczba kupujących",
+                    "d) Wysokie bariery wejścia na rynek"
+                ],
+                "reason": "Rynek wolnej konkurencji charakteryzuje się dużą liczbą sprzedających i kupujących, jednorodnością produktów oraz doskonałą informacją rynkową."
+            },
+            {
+                "question": "Jeśli na rynku wolnej konkurencji cena jednego produktu wynosi 10 zł, a koszty produkcji to 7 zł, jaki jest zysk na jednostkę produktu?",
+                "options": [
+                    "*a) 3 zł",
+                    "b) 7 zł",
+                    "c) 10 zł",
+                    "d) 17 zł"
+                ],
+                "reason": "Zysk na jednostkę produktu wynosi cena minus koszty produkcji: 10 zł - 7 zł = 3 zł."
+            },
+            {
+                "question": "Jakie są skutki monopolu dla konsumentów?",
+                "options": [
+                    "a) Niskie ceny produktów",
+                    "b) Brak różnorodności produktów",
+                    "*c) Wysokie ceny i ograniczony wybór",
+                    "d) Wysoka jakość usług"
+                ],
+                "reason": "Monopol prowadzi do wysokich cen i ograniczonego wyboru dla konsumentów, ponieważ brak konkurencji pozwala monopolistom na dyktowanie cen."
+            },
+            {
+                "question": "Co to jest elastyczność cenowa popytu?",
+                "options": [
+                    "*a) Miarą wrażliwości popytu na zmiany ceny",
+                    "b) Wskaźnikiem produkcji",
+                    "c) Miarą dochodu narodowego",
+                    "d) Indeksem cen konsumpcyjnych"
+                ],
+                "reason": "Elastyczność cenowa popytu mierzy, jak bardzo popyt reaguje na zmiany ceny danego dobra."
+            },
+            {
+                "question": "Jeśli elastyczność cenowa popytu wynosi -1.5, a cena produktu wzrasta o 10%, o ile procent zmniejszy się popyt?",
+                "options": [
+                    "a) 1.5%",
+                    "b) 10%",
+                    "*c) 15%",
+                    "d) 5%"
+                ],
+                "reason": "Zmiana popytu obliczana jest jako elastyczność cenowa popytu razy zmiana ceny: -1.5 * 10% = -15%."
+            },
+            {
+                "question": "Jakie czynniki wpływają na elastyczność cenową podaży?",
+                "options": [
+                    "*a) Dostępność zasobów, czas reakcji producentów, technologia",
+                    "b) Dochód konsumentów",
+                    "c) Polityka fiskalna",
+                    "d) Wysokość podatków"
+                ],
+                "reason": "Elastyczność cenowa podaży zależy od dostępności zasobów, czasu reakcji producentów na zmiany cen oraz technologii używanej w produkcji."
+            }
+        ]
+
+        var maxQuestions = questions.length;
+        var answered = 0;
+
+        function learn() {
+            randomQuestionId = 0;
+            lastWrongAnsweredId = -1;
+            createQuestionNumberArray();
+            console.log(questionNumberArray);
+
+            document.getElementById("selectMode").style = "display: none;";
+            document.getElementById("modeDiv").classList.add("questionContainer");
+            loadLearnQuestion();
+        }
+
+
+        function test() {
+            answered = 0;
+            randomQuestionId = 0;
+            lastWrongAnsweredId = -1;
+            document.getElementById("selectMode").style = "display: none;";
+            document.getElementById("modeDiv").innerHTML = "";
+            numberofQuestions = prompt("Podaj liczbę pytań testowych:");
+            document.getElementById("modeDiv").classList.add("questionContainer");
+            document.getElementById("main").classList.remove("main");
+            document.getElementById("main").classList.add("testMain");
+            loadTestQuestions();
+        }
+        function checkLearnAnswer() {
+            var selectedAnswers = [];
+            ["a", "b", "c", "d"].forEach(element => { // Dodano "d" do tablicy
+                var input = document.getElementById(element);
+                if (input.checked) {
+                    selectedAnswers.push(document.getElementById(element).value);
+                }
+            });
+            var goodAnswers = [];
+            questions[randomQuestionId].options.forEach(element => {
+                if (element.slice(0, 2).includes("*")) {
+                    goodAnswers.push(element.slice(0, 2));
+                }
+            });
+            console.log(goodAnswers);
+            console.log(selectedAnswers);
+            if (selectedAnswers.length == goodAnswers.length) {
+                if (goodAnswers.every(r => selectedAnswers.includes(r))) {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                    console.log("aaa");
+                    answered += 1;
+                    lastWrongAnsweredId = -1;
+                }
+                else {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: darkred;";
+                    });
+                    goodAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                    lastWrongAnsweredId = randomQuestionId;
+                }
+            }
+            else {
+                selectedAnswers.forEach(element => {
+                    element = element.replace("*", "").replace(")", "").replace(" ", "");
+                    console.log(element);
+                    var input = document.querySelector("label[for=" + element + "]");
+                    console.log(input);
+                    if (input != undefined)
+                        input.style = "color: darkred;";
+                });
+                goodAnswers.forEach(element => {
+                    element = element.replace("*", "").replace(")", "").replace(" ", "");
+                    console.log(element);
+                    var input = document.querySelector("label[for=" + element + "]");
+                    console.log(input);
+                    if (input != undefined)
+                        input.style = "color: green; font-weight: bold;";
+                });
+                lastWrongAnsweredId = randomQuestionId;
+            }
+            document.getElementById("checkme").style = "display: none;";
+            document.getElementById("modeDiv").innerHTML += "<p>" + questions[randomQuestionId].reason + "</p>";
+            document.getElementById("modeDiv").innerHTML += "<button class='btn btn-secondary float-end' onclick='loadLearnQuestion()'>Idź dalej!</button>";
+            selectedAnswers.forEach(element => {
+                element = element.replace("*", "").replace(")", "").replace(" ", "");
+                document.getElementById(element).checked = true;
+            });
+        }
+
+        function loadLearnQuestion() {
+            document.getElementById("modeDiv").innerHTML = "";
+            if (selectRandomQuestionId(questionNumberArray, lastWrongAnsweredId)) {
+                // Dodano opcję "d" do wyświetlania
+                document.getElementById("modeDiv").innerHTML = "<div class='progress' role='progressbar' aria-valuenow='" + answered + "' aria-valuemin='0' aria-valuemax='" + maxQuestions + "'><div class='progress-bar' style='width: " + (answered * (100 / maxQuestions)) + "%'></div></div><br><p>" + questions[randomQuestionId].question + "</p><input type='checkbox' value='" + questions[randomQuestionId].options[0].slice(0, 2) + "' id='a'><br><label for='a'>" + questions[randomQuestionId].options[0].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[1].slice(0, 2) + "' id='b'><br><label for='b'>" + questions[randomQuestionId].options[1].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[2].slice(0, 2) + "' id='c'><br><label for='c'>" + questions[randomQuestionId].options[2].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[3].slice(0, 2) + "' id='d'><br><label for='d'>" + questions[randomQuestionId].options[3].slice(3) + "</label><br><br><hr><button id='checkme' class='btn btn-secondary float-end' onclick='checkLearnAnswer()'>Zatwierdź odpowiedzi</button>";
+            }
+            else {
+                document.getElementById("modeDiv").innerHTML = "<div class='text-center'><h1>Uczyłeś się już wszystkiego!</h1><button class='btn btn-secondary' onclick='window.location.href=window.location.href'>Wróć do menu głównego</button></div>";
+            }
+        }
+
+        function checkTestAnswers() {
+            var questionForms = document.querySelectorAll(".question");
+            var answeredGood = 0;
+            for (var i = 0; i < questionForms.length; i++) {
+                var questionId = questionForms[i].querySelector("input[type='hidden']").value;
+
+                var selectedAnswers = [];
+                // Dodano "d" do tablicy
+                ["a" + questionId, "b" + questionId, "c" + questionId, "d" + questionId].forEach(element => {
+                    var input = questionForms[i].querySelector("#" + element);
+                    if (input.checked) {
+                        selectedAnswers.push(input.value);
+                    }
+                });
+                var goodAnswers = [];
+                questions[questionId].options.forEach(element => {
+                    if (element.slice(0, 2).includes("*")) {
+                        goodAnswers.push(element.slice(0, 2));
+                    }
+                });
+
+                if (selectedAnswers.length == goodAnswers.length) {
+                    if (goodAnswers.every(r => selectedAnswers.includes(r))) {
+                        selectedAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: green; font-weight: bold;";
+                            answeredGood += 1;
+                        });
+                    }
+                    else {
+                        selectedAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: darkred;";
+                        });
+                        goodAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: green; font-weight: bold;";
+                        });
+                    }
+                }
+                else {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                        if (input != undefined)
+                            input.style = "color: darkred;";
+                    });
+                    goodAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                }
+            }
+            document.getElementById("modeDiv").innerHTML += "<h1>Gratulacje! Uzyskałeś wynik " + answeredGood + "/" + numberofQuestions + " (" + (answeredGood / numberofQuestions) * 100 + "%)</h1><br><button class='btn btn-secondary' onclick='window.location.href=window.location.href'>Wróć do menu głównego</button>";
+            document.getElementById("testcheck").style = "display: none;";
+        }
+
+        function loadTestQuestions() {
+            createQuestionNumberArray();
+            console.log(numberofQuestions);
+            for (var i = 0; i < numberofQuestions; i++) {
+                if (selectRandomQuestionId(questionNumberArray, lastWrongAnsweredId)) {
+                    // Dodano opcję "d" do wyświetlania
+                    document.getElementById("modeDiv").innerHTML += "<div class='question'><p>" + questions[randomQuestionId].question + "</p><input type='checkbox' value='" + questions[randomQuestionId].options[0].slice(0, 2) + "' id='a" + randomQuestionId + "'><label for='a" + randomQuestionId + "'>" + questions[randomQuestionId].options[0].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[1].slice(0, 2) + "' id='b" + randomQuestionId + "'><label for='b" + randomQuestionId + "'>" + questions[randomQuestionId].options[1].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[2].slice(0, 2) + "' id='c" + randomQuestionId + "'><label for='c" + randomQuestionId + "'>" + questions[randomQuestionId].options[2].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[3].slice(0, 2) + "' id='d" + randomQuestionId + "'><label for='d" + randomQuestionId + "'>" + questions[randomQuestionId].options[3].slice(3) + "</label><input type='hidden' value='" + randomQuestionId + "'></div><br><hr>";
+                }
+            }
+            document.getElementById("modeDiv").innerHTML += "<br><br><button class='btn btn-secondary' id='testcheck' onclick='checkTestAnswers()'>Sprawdź test</button>";
+        }
+
+        function createQuestionNumberArray() {
+            elementId = 0;
+            questions.forEach(element => {
+                questionNumberArray.push(elementId);
+                elementId++;
+            });
+        }
+
+        function selectRandomQuestionId(availableQuestions, lastWrongAnsweredId) {
+            if (lastWrongAnsweredId == randomQuestionId) {
+                return true;
+            }
+
+            if (availableQuestions.length === 0) {
+                return false;
+            }
+
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+
+            randomQuestionId = availableQuestions[randomIndex];
+            availableQuestions.splice(randomIndex, 1);
+            return true;
+        }
+    </script>
+</body>
+
+</html>
