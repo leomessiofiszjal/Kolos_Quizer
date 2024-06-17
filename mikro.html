@@ -337,8 +337,8 @@
             {
                 "question": "Jaki jest współczynnik zmienności, jeśli odchylenie standardowe wynosi 1000, a średnia arytmetyczna 5000?",
                 "options": [
-                    "a) 0,2",
-                    "*b) 0,25",
+                    "*a) 0,2",
+                    "b) 0,25",
                     "c) 5",
                     "d) 2"
                 ],
@@ -347,12 +347,12 @@
             {
                 "question": "W modelu ruchu okrężnego, jakiego rodzaju strumień pieniężny reprezentują płace?",
                 "options": [
-                    "a) Wydatki przedsiębiorstw.",
+                    "*a) Wydatki przedsiębiorstw.",
                     "*b) Dochody gospodarstw domowych.",
                     "c) Wydatki gospodarstw domowych.",
                     "d) Dochody przedsiębiorstw."
                 ],
-                "reason": "Płace są częścią dochodów gospodarstw domowych w modelu ruchu okrężnego."
+                "reason": "Płace są częścią dochodów gospodarstw domowych w modelu ruchu okrężnego. Płace są również wydatkami przedsiębiorstw, ponieważ firmy płacą pracownikom za ich usługi."
             },
             {
                 "question": "Co to jest zysk normalny?",
@@ -457,7 +457,7 @@
             {
                 "question": "Jeśli przedsiębiorstwo sprzedaje 100 sztuk produktu po 10 zł za sztukę, a koszt produkcji 1 sztuki wynosi 5 zł, jaki jest zysk netto?",
                 "options": [
-                    "a) 500 zł",
+                    "a) 600 zł",
                     "*b) 500 zł",
                     "c) 1000 zł",
                     "d) 1500 zł"
@@ -487,7 +487,7 @@
             {
                 "question": "Jeśli utarg całkowity wynosi 1000 zł, a koszt całkowity wynosi 600 zł, jaki jest zysk brutto?",
                 "options": [
-                    "a) 400 zł",
+                    "a) 300 zł",
                     "*b) 400 zł",
                     "c) 1600 zł",
                     "d) 600 zł"
@@ -604,42 +604,6 @@
                 ],
                 "reason": "Opisana sytuacja to Paradoks Giffena. Paradoks ten mówi o sytuacji, gdy podniesienie ceny dobra podstawowego (takiego jak np. chleb w bardzo biednych społecznościach) powoduje zwiększenie popytu na to dobro. Jest to przypadek, który wydaje się sprzeczny z prawem popytu, ale może wystąpić, gdy dobro jest tak fundamentalne dla codziennego życia, że konsumenci muszą go kupować mimo wzrostu ceny."
             }
-        ]
-
-        var maxQuestions = questions.length;
-        var answered = 0;
-
-        function learn() {
-            randomQuestionId = 0;
-            lastWrongAnsweredId = -1;
-            createQuestionNumberArray();
-            console.log(questionNumberArray);
-
-            document.getElementById("selectMode").style = "display: none;";
-            document.getElementById("modeDiv").classList.add("questionContainer");
-            loadLearnQuestion();
-        }
-
-
-        function test() {
-            answered = 0;
-            randomQuestionId = 0;
-            lastWrongAnsweredId = -1;
-            document.getElementById("selectMode").style = "display: none;";
-            document.getElementById("modeDiv").innerHTML = "";
-            numberofQuestions = prompt("Podaj liczbę pytań testowych:");
-            document.getElementById("modeDiv").classList.add("questionContainer");
-            document.getElementById("main").classList.remove("main");
-            document.getElementById("main").classList.add("testMain");
-            loadTestQuestions();
-        }
-        function checkLearnAnswer() {
-            var selectedAnswers = [];
-            ["a", "b", "c", "d"].forEach(element => { // Dodano "d" do tablicy
-                var input = document.getElementById(element);
-                if (input.checked) {
-                    selectedAnswers.push(document.getElementById(element).value);
-                }
             });
             var goodAnswers = [];
             questions[randomQuestionId].options.forEach(element => {
