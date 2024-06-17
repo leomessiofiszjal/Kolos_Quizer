@@ -21,8 +21,7 @@
                 width: 100%;
             }
 
-            .questionContainer {
-            }
+            .questionContainer {}
 
             .testMain {
                 padding: 16px;
@@ -64,8 +63,7 @@
 <body>
     <div class="main" id="main">
         <div id="selectMode" class="text-center">
-            <img width="80%"
-                src="https://i.imgur.com/jOtYssK.jpg">
+            <img width="80%" src="https://i.imgur.com/jOtYssK.jpg">
             <h1>Mikro-Maksymalizacja Sukcesów Dydaktyczno-Modelarskich</h1>
             <button class="btn btn-secondary" onclick="learn()">Ucz mnie szefie</button>
             <button class="btn btn-secondary" onclick="test()">Testuj mnie dajesz</button>
@@ -504,7 +502,7 @@
                 ],
                 "reason": "Głównym celem działania UOKiK jest ochrona konkurencji na rynku."
             },
-                        {
+            {
                 "question": "Wskaż gdzie znajdują się tylko czynniki produkcji.",
                 "options": [
                     "*a) Praca, ziemia, kapitał, wiedza",
@@ -604,7 +602,43 @@
                 ],
                 "reason": "Opisana sytuacja to Paradoks Giffena. Paradoks ten mówi o sytuacji, gdy podniesienie ceny dobra podstawowego (takiego jak np. chleb w bardzo biednych społecznościach) powoduje zwiększenie popytu na to dobro. Jest to przypadek, który wydaje się sprzeczny z prawem popytu, ale może wystąpić, gdy dobro jest tak fundamentalne dla codziennego życia, że konsumenci muszą go kupować mimo wzrostu ceny."
             }
-        ];
+        ]
+
+        var maxQuestions = questions.length;
+        var answered = 0;
+
+        function learn() {
+            randomQuestionId = 0;
+            lastWrongAnsweredId = -1;
+            createQuestionNumberArray();
+            console.log(questionNumberArray);
+
+            document.getElementById("selectMode").style = "display: none;";
+            document.getElementById("modeDiv").classList.add("questionContainer");
+            loadLearnQuestion();
+        }
+
+
+        function test() {
+            answered = 0;
+            randomQuestionId = 0;
+            lastWrongAnsweredId = -1;
+            document.getElementById("selectMode").style = "display: none;";
+            document.getElementById("modeDiv").innerHTML = "";
+            numberofQuestions = prompt("Podaj liczbę pytań testowych:");
+            document.getElementById("modeDiv").classList.add("questionContainer");
+            document.getElementById("main").classList.remove("main");
+            document.getElementById("main").classList.add("testMain");
+            loadTestQuestions();
+        }
+        function checkLearnAnswer() {
+            var selectedAnswers = [];
+            ["a", "b", "c", "d"].forEach(element => { // Dodano "d" do tablicy
+                var input = document.getElementById(element);
+                if (input.checked) {
+                    selectedAnswers.push(document.getElementById(element).value);
+                }
+            });
             var goodAnswers = [];
             questions[randomQuestionId].options.forEach(element => {
                 if (element.slice(0, 2).includes("*")) {
@@ -673,6 +707,7 @@
                 element = element.replace("*", "").replace(")", "").replace(" ", "");
                 document.getElementById(element).checked = true;
             });
+        }
 
         function loadLearnQuestion() {
             document.getElementById("modeDiv").innerHTML = "";
