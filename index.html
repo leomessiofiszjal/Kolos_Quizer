@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pl" data-bs-theme="dark">
+
+<head>
+    <title>Strona Główna - Quizy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <style>
+        @media only screen and (max-width: 1080px) {
+            .main {
+                padding: 16px;
+                width: 100%;
+            }
+
+            .menuContainer {
+            }
+
+            .testMain {
+                padding: 16px;
+                width: 100%;
+            }
+        }
+
+        @media only screen and (min-width: 1080px) {
+            .main {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100vh;
+            }
+
+            .menuContainer {
+                width: 30vw;
+            }
+
+            .testMain {
+                padding: 32px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                overflow: auto;
+                width: 100%;
+                height: 100vh;
+            }
+        }
+
+        p {
+            font-weight: bold;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="main" id="main">
+        <div id="menu" class="text-center">
+            <h1>Quizery Egzaminacyjne</h1>
+            <button class="btn btn-secondary" onclick="window.location.href='prawo.html'">Prawo Prawne</button>
+            <button class="btn btn-secondary" onclick="window.location.href='mikro.html'">Mikroekonomia</button>
+        </div>
+        <div id="modeDiv">
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
