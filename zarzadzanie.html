@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pl" data-bs-theme="dark">
+
+<head>
+    <title>Zarządzanie Kierownicą</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LYWBPREM5N"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-LYWBPREM5N');
+    </script>
+    <style>
+        @media only screen and (max-width: 1080px) {
+            .main {
+                padding: 16px;
+                width: 100%;
+            }
+
+            .questionContainer {}
+
+            .testMain {
+                padding: 16px;
+                width: 100%;
+            }
+        }
+
+        @media only screen and (min-width: 1080px) {
+            .main {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100vh;
+            }
+
+            .questionContainer {
+                width: 30vw;
+            }
+
+            .testMain {
+                padding: 32px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                overflow: auto;
+                width: 100%;
+                height: 100vh;
+            }
+        }
+
+        p {
+            font-weight: bold;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="main" id="main">
+        <div id="selectMode" class="text-center">
+            <img width="80%" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.galleries.smcloud.net%2Ft%2Fgalleries%2Fgf-rBn8-XnD3-H7Mq_awantura-o-kase-664x442-nocrop.jpg&f=1&nofb=1&ipt=2365796c99e91eaa020f3fc35a7c0f15bae37a327a27017f69af7896e48d2d13&ipo=images">
+            <h1>Zarządzanie małpami w jednej lekcji</h1>
+            <button class="btn btn-secondary" onclick="learn()">Ucz mnie szefie</button>
+            <button class="btn btn-secondary" onclick="test()">Testuj mnie dajesz</button>
+        </div>
+        <div id="modeDiv">
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script>
+        var questionNumberArray = [];
+        var randomQuestionId = 0;
+        var lastWrongAnsweredId = -1;
+        var numberofQuestions = 0;
+
+        const questions = [
+  {
+    "question": "Co to jest zarządzanie?",
+    "options": [
+      "*a) Zestaw działań obejmujący planowanie, podejmowanie decyzji, organizowanie, przewodzenie i kontrolowanie, skierowanych na zasoby organizacji i wykonywanych w celu osiągnięcia celów organizacji",
+      "b) Rozporządzanie zasobami organizacji poprzez działanie z ludźmi i poprzez ludzi w zakresie określonym przez właściciela tych zasobów",
+      "c) Utrzymywanie porządku i nadzorowanie codziennych działań zgodnie z ustalonymi procedurami",
+      "d) Powodowanie, aby inne rzeczy funkcjonowały zgodnie z celem kierującego"
+    ],
+    "reason": "**Zarządzanie** to zestaw działań (planowanie, podejmowanie decyzji, organizowanie, przewodzenie i kontrolowanie) skierowanych na zasoby organizacji, wykonywanych w celu osiągnięcia jej celów. Inne definicje, takie jak rozporządzanie zasobami, administrowanie czy powodowanie, aby inne rzeczy funkcjonowały zgodnie z celem, są powiązane, ale nie są pełną definicją zarządzania."
+  },
+  {
+    "question": "Jakie są główne funkcje zarządzania?",
+    "options": [
+        "a) Planowanie, organizowanie, motywowanie i kontrolowanie",
+        "b) Kierowanie, administrowanie i sterowanie",
+        "*c) Planowanie, organizowanie, przewodzenie (kierowanie ludźmi) i kontrolowanie",
+        "d) Ustalanie celów, pozyskiwanie zasobów, realizowanie planu i kontrolowanie"
+    ],
+     "reason": "**Funkcje zarządzania** obejmują planowanie, organizowanie, przewodzenie (kierowanie ludźmi) i kontrolowanie. Chociaż kierowanie, administrowanie i sterowanie są powiązanymi pojęciami, nie są uważane za główne funkcje zarządzania w tym kontekście. Ustalanie celów, pozyskiwanie zasobów, realizowanie planu i kontrolowanie są etapami cyklu zorganizowanego, a nie funkcjami zarządzania."
+   },
+  {
+    "question": "Co obejmuje cykl zorganizowany według J. Zieleniewskiego?",
+     "options": [
+        "a) Planowanie, organizowanie, motywowanie i kontrolowanie",
+        "b) Określenie celu, planowanie działania, pozyskanie zasobów, realizacja planu, kontrolowanie",
+        "*c) Określenie celu, planowanie działania, pozyskanie i rozmieszczenie zasobów, realizacja planu, kontrolowanie realizacji",
+        "d) Ustalenie misji, wizji i strategii"
+     ],
+    "reason": "Cykl zorganizowany według J. Zieleniewskiego składa się z pięciu etapów: **określenie celu, planowanie działania, pozyskanie i rozmieszczenie zasobów, realizacja planu oraz kontrolowanie realizacji**. Ustalenie misji, wizji i strategii są elementami planowania, a nie całego cyklu zorganizowanego."
+  },
+    {
+    "question": "Czym różni się administrowanie od zarządzania?",
+    "options": [
+        "a) Administrowanie jest szersze i obejmuje zarządzanie",
+        "b) Zarządzanie i administrowanie są tożsame",
+        "*c) Administrowanie jest bardziej operacyjne, polega na utrzymaniu porządku, podczas gdy zarządzanie obejmuje również strategiczne decyzje",
+        "d) Zarządzanie skupia się na zasobach, a administrowanie na ludziach"
+    ],
+    "reason": "**Administrowanie** jest bardziej **operacyjne**, polega na utrzymaniu porządku i nadzorowaniu codziennych działań, podczas gdy **zarządzanie** obejmuje również **strategiczne decyzje** i planowanie. Zarządzanie i administrowanie są odmianami kierowania, które różnią się co do zakresu i form oddziaływania. Kierowanie jest pojęciem szerszym, a zarządzanie jedną z jego postaci. Zarządzanie skupia się na zasobach i wykonywaniu działań z ludźmi, a nie tylko na ludziach."
+  },
+ {
+    "question": "Jakie są główne role kierownicze według H. Mintzberga?",
+        "options": [
+            "a)  Przywódca, obserwator, negocjator",
+             "*b) Interpersonalne, informacyjne i decyzyjne",
+            "c) Planowanie, organizowanie, motywowanie i kontrolowanie",
+            "d) Strategiczne, taktyczne i operacyjne"
+           ],
+    "reason":"Główne role kierownicze według H. Mintzberga dzielą się na trzy kategorie: **role interpersonalne, informacyjne i decyzyjne**. Przykłady ról to przywódca, obserwator i negocjator, ale to nie są główne kategorie. Pozostałe opcje to funkcje zarządzania lub poziomy celów, a nie kategorie ról kierowniczych."
+  },
+    {
+        "question": "Jakie są typowe style kierowania?",
+    "options": [
+          "a) Autokratyczny, demokratyczny, liberalny",
+          "b) Dyrektywny, wspierający, nadzorujący",
+          "*c) Dyrektywny, konsultatywny, partycypacyjny i bierny (nadzorujący/delegujący)",
+          "d)  Liniowy, sztabowy, funkcjonalny"
+            ],
+        "reason": "Typowe style kierowania to **dyrektywny, konsultatywny, partycypacyjny i bierny** (nadzorujący lub delegujący). Style autokratyczny, demokratyczny i liberalny są podobne, ale nie użyte w tym materiale. Pozostałe opcje, czyli style liniowy, sztabowy i funkcjonalny odnoszą się do typów stanowisk pracy a nie stylów kierowania."
+    },
+    {
+    "question": "Jakie są główne źródła oporu wobec zmian?",
+        "options": [
+            "a)  Brak informacji, niepewność, strach przed nieznanym",
+             "*b) Źródła osobowościowe, społeczne, tkwiące w samej zmianie i w organizacji procesu zmian",
+            "c) Czynniki zewnętrzne i wewnętrzne",
+            "d)  Brak celów, strategii i planowania"
+           ],
+    "reason": "Główne źródła oporu wobec zmian to **źródła tkwiące w osobowości człowieka, w oddziaływaniu grupy społecznej, w samej zmianie oraz w organizacji procesu zmian**. Brak informacji, niepewność i strach przed nieznanym to tylko przykłady źródeł, ale nie wszystkie. Pozostałe opcje czyli czynniki zewnętrzne i wewnętrzne oraz brak celów strategii i planowania to nie główne źródła oporu wobec zmian."
+  },
+  {
+    "question": "Jakie są elementy analizy SWOT?",
+      "options": [
+        "a)  Strategia, wizja, okazje, zagrożenia",
+         "*b)  Mocne strony, słabe strony, szanse, zagrożenia",
+        "c) Planowanie, organizowanie, motywowanie, kontrolowanie",
+        "d)  Zasoby ludzkie, finansowe, rzeczowe i informacyjne"
+         ],
+    "reason": "**Analiza SWOT** składa się z czterech elementów: **mocne strony, słabe strony, szanse i zagrożenia**. Strategia, wizja, to elementy procesu planowania a nie analizy SWOT. Pozostałe opcje czyli funkcje zarządzania i typy zasobów to inne koncepcje."
+  },
+ {
+    "question": "Jakie są etapy procesu racjonalnego podejmowania decyzji?",
+        "options": [
+            "a)  Ustalenie celu, analiza SWOT, wybór strategii",
+             "*b) Rozpoznanie sytuacji, identyfikacja wariantów, ocena wariantów, wybór wariantu, wdrożenie, obserwacja wyników",
+            "c) Planowanie, organizowanie, motywowanie, kontrolowanie",
+            "d)  Pozyskanie zasobów, realizacja planu, kontrola"
+           ],
+    "reason": "Etapy procesu racjonalnego podejmowania decyzji to: **rozpoznanie i zdefiniowanie sytuacji, identyfikacja alternatywnych możliwości, ocena wariantów, wybór najlepszego wariantu, wdrożenie wybranego wariantu i obserwacja wyników**. Ustalenie celu, analiza SWOT, wybór strategii i funkcje zarządzania to elementy planowania a nie procesu decyzyjnego."
+   },
+    {
+    "question": "Na czym polega specjalizacja pracy?",
+    "options": [
+      "*a) Na podziale pracy na mniejsze, wyspecjalizowane zadania",
+       "b) Na delegowaniu uprawnień decyzyjnych",
+       "c) Na budowie struktury organizacyjnej",
+       "d) Na koordynacji czynności między stanowiskami"
+       ],
+    "reason": "Specjalizacja pracy polega na **podziale pracy na mniejsze, wyspecjalizowane zadania**. Delegowanie uprawnień decyzyjnych, budowa struktury organizacyjnej i koordynacja czynności to inne aspekty organizowania, ale nie to jest definicją specjalizacji pracy."
+  }
+        ]
+
+        var maxQuestions = questions.length;
+        var answered = 0;
+
+        function learn() {
+            randomQuestionId = 0;
+            lastWrongAnsweredId = -1;
+            createQuestionNumberArray();
+            console.log(questionNumberArray);
+
+            document.getElementById("selectMode").style = "display: none;";
+            document.getElementById("modeDiv").classList.add("questionContainer");
+            loadLearnQuestion();
+        }
+
+
+        function test() {
+            answered = 0;
+            randomQuestionId = 0;
+            lastWrongAnsweredId = -1;
+            document.getElementById("selectMode").style = "display: none;";
+            document.getElementById("modeDiv").innerHTML = "";
+            numberofQuestions = prompt("Podaj liczbę pytań testowych:");
+            document.getElementById("modeDiv").classList.add("questionContainer");
+            document.getElementById("main").classList.remove("main");
+            document.getElementById("main").classList.add("testMain");
+            loadTestQuestions();
+        }
+        function checkLearnAnswer() {
+            var selectedAnswers = [];
+            ["a", "b", "c", "d"].forEach(element => { // Dodano "d" do tablicy
+                var input = document.getElementById(element);
+                if (input.checked) {
+                    selectedAnswers.push(document.getElementById(element).value);
+                }
+            });
+            var goodAnswers = [];
+            questions[randomQuestionId].options.forEach(element => {
+                if (element.slice(0, 2).includes("*")) {
+                    goodAnswers.push(element.slice(0, 2));
+                }
+            });
+            console.log(goodAnswers);
+            console.log(selectedAnswers);
+            if (selectedAnswers.length == goodAnswers.length) {
+                if (goodAnswers.every(r => selectedAnswers.includes(r))) {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                    console.log("aaa");
+                    answered += 1;
+                    lastWrongAnsweredId = -1;
+                }
+                else {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: darkred;";
+                    });
+                    goodAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                    lastWrongAnsweredId = randomQuestionId;
+                }
+            }
+            else {
+                selectedAnswers.forEach(element => {
+                    element = element.replace("*", "").replace(")", "").replace(" ", "");
+                    console.log(element);
+                    var input = document.querySelector("label[for=" + element + "]");
+                    console.log(input);
+                    if (input != undefined)
+                        input.style = "color: darkred;";
+                });
+                goodAnswers.forEach(element => {
+                    element = element.replace("*", "").replace(")", "").replace(" ", "");
+                    console.log(element);
+                    var input = document.querySelector("label[for=" + element + "]");
+                    console.log(input);
+                    if (input != undefined)
+                        input.style = "color: green; font-weight: bold;";
+                });
+                lastWrongAnsweredId = randomQuestionId;
+            }
+            document.getElementById("checkme").style = "display: none;";
+            document.getElementById("modeDiv").innerHTML += "<p>" + questions[randomQuestionId].reason + "</p>";
+            document.getElementById("modeDiv").innerHTML += "<button class='btn btn-secondary float-end' onclick='loadLearnQuestion()'>Idź dalej!</button>";
+            selectedAnswers.forEach(element => {
+                element = element.replace("*", "").replace(")", "").replace(" ", "");
+                document.getElementById(element).checked = true;
+            });
+        }
+
+        function loadLearnQuestion() {
+            document.getElementById("modeDiv").innerHTML = "";
+            if (selectRandomQuestionId(questionNumberArray, lastWrongAnsweredId)) {
+                // Dodano opcję "d" do wyświetlania
+                document.getElementById("modeDiv").innerHTML = "<div class='progress' role='progressbar' aria-valuenow='" + answered + "' aria-valuemin='0' aria-valuemax='" + maxQuestions + "'><div class='progress-bar' style='width: " + (answered * (100 / maxQuestions)) + "%'></div></div><br><p>" + questions[randomQuestionId].question + "</p><input type='checkbox' value='" + questions[randomQuestionId].options[0].slice(0, 2) + "' id='a'><br><label for='a'>" + questions[randomQuestionId].options[0].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[1].slice(0, 2) + "' id='b'><br><label for='b'>" + questions[randomQuestionId].options[1].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[2].slice(0, 2) + "' id='c'><br><label for='c'>" + questions[randomQuestionId].options[2].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[3].slice(0, 2) + "' id='d'><br><label for='d'>" + questions[randomQuestionId].options[3].slice(3) + "</label><br><br><hr><button id='checkme' class='btn btn-secondary float-end' onclick='checkLearnAnswer()'>Zatwierdź odpowiedzi</button>";
+            }
+            else {
+                document.getElementById("modeDiv").innerHTML = "<div class='text-center'><h1>Uczyłeś się już wszystkiego!</h1><button class='btn btn-secondary' onclick='window.location.href=window.location.href'>Wróć do menu głównego</button></div>";
+            }
+        }
+
+        function checkTestAnswers() {
+            var questionForms = document.querySelectorAll(".question");
+            var answeredGood = 0;
+            for (var i = 0; i < questionForms.length; i++) {
+                var questionId = questionForms[i].querySelector("input[type='hidden']").value;
+
+                var selectedAnswers = [];
+                // Dodano "d" do tablicy
+                ["a" + questionId, "b" + questionId, "c" + questionId, "d" + questionId].forEach(element => {
+                    var input = questionForms[i].querySelector("#" + element);
+                    if (input.checked) {
+                        selectedAnswers.push(input.value);
+                    }
+                });
+                var goodAnswers = [];
+                questions[questionId].options.forEach(element => {
+                    if (element.slice(0, 2).includes("*")) {
+                        goodAnswers.push(element.slice(0, 2));
+                    }
+                });
+
+                if (selectedAnswers.length == goodAnswers.length) {
+                    if (goodAnswers.every(r => selectedAnswers.includes(r))) {
+                        selectedAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: green; font-weight: bold;";
+                            answeredGood += 1;
+                        });
+                    }
+                    else {
+                        selectedAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: darkred;";
+                        });
+                        goodAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: green; font-weight: bold;";
+                        });
+                    }
+                }
+                else {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                        if (input != undefined)
+                            input.style = "color: darkred;";
+                    });
+                    goodAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                }
+            }
+            document.getElementById("modeDiv").innerHTML += "<h1>Gratulacje! Uzyskałeś wynik " + answeredGood + "/" + numberofQuestions + " (" + (answeredGood / numberofQuestions) * 100 + "%)</h1><br><button class='btn btn-secondary' onclick='window.location.href=window.location.href'>Wróć do menu głównego</button>";
+            document.getElementById("testcheck").style = "display: none;";
+        }
+
+        function loadTestQuestions() {
+            createQuestionNumberArray();
+            console.log(numberofQuestions);
+            for (var i = 0; i < numberofQuestions; i++) {
+                if (selectRandomQuestionId(questionNumberArray, lastWrongAnsweredId)) {
+                    // Dodano opcję "d" do wyświetlania
+                    document.getElementById("modeDiv").innerHTML += "<div class='question'><p>" + questions[randomQuestionId].question + "</p><input type='checkbox' value='" + questions[randomQuestionId].options[0].slice(0, 2) + "' id='a" + randomQuestionId + "'><label for='a" + randomQuestionId + "'>" + questions[randomQuestionId].options[0].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[1].slice(0, 2) + "' id='b" + randomQuestionId + "'><label for='b" + randomQuestionId + "'>" + questions[randomQuestionId].options[1].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[2].slice(0, 2) + "' id='c" + randomQuestionId + "'><label for='c" + randomQuestionId + "'>" + questions[randomQuestionId].options[2].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[3].slice(0, 2) + "' id='d" + randomQuestionId + "'><label for='d" + randomQuestionId + "'>" + questions[randomQuestionId].options[3].slice(3) + "</label><input type='hidden' value='" + randomQuestionId + "'></div><br><hr>";
+                }
+            }
+            document.getElementById("modeDiv").innerHTML += "<br><br><button class='btn btn-secondary' id='testcheck' onclick='checkTestAnswers()'>Sprawdź test</button>";
+        }
+
+        function createQuestionNumberArray() {
+            elementId = 0;
+            questions.forEach(element => {
+                questionNumberArray.push(elementId);
+                elementId++;
+            });
+        }
+
+        function selectRandomQuestionId(availableQuestions, lastWrongAnsweredId) {
+            if (lastWrongAnsweredId == randomQuestionId) {
+                return true;
+            }
+
+            if (availableQuestions.length === 0) {
+                return false;
+            }
+
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+
+            randomQuestionId = availableQuestions[randomIndex];
+            availableQuestions.splice(randomIndex, 1);
+            return true;
+        }
+    </script>
+</body>
+
+</html>
