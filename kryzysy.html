@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="pl" data-bs-theme="dark">
+
+<head>
+    <title>Kryzysy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <style>
+        @media only screen and (max-width: 1080px) {
+            .main {
+                padding: 16px;
+                width: 100%;
+            }
+
+            .questionContainer {}
+
+            .testMain {
+                padding: 16px;
+                width: 100%;
+            }
+        }
+
+        @media only screen and (min-width: 1080px) {
+            .main {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100vh;
+            }
+
+            .questionContainer {
+                width: 30vw;
+            }
+
+            .testMain {
+                padding: 32px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                overflow: auto;
+                width: 100%;
+                height: 100vh;
+            }
+        }
+
+        p {
+            font-weight: bold;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="main" id="main">
+        <div id="selectMode" class="text-center">
+            <img width="80%"
+                src="https://image3.slideserve.com/5431267/krzy-keynesowski-l.jpg">
+            <h1>Kryzys uczelniany - nikt nie zdał</h1>
+            <button class="btn btn-secondary" onclick="learn()">Ucz mnie szefie</button>
+            <button class="btn btn-secondary" onclick="test()">Testuj mnie dajesz</button>
+        </div>
+        <div id="modeDiv">
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script>
+        var questionNumberArray = [];
+        var randomQuestionId = 0;
+        var lastWrongAnsweredId = -1;
+        var numberofQuestions = 0;
+
+const questions = [
+    {
+        question: "Which of the following is NOT one of the five stages of crisis listed in the material?",
+        options: [
+            "a) Cumulation",
+            "b) Outbreak",
+            "*c) Stagnation",
+            "d) Chaos"
+        ],
+        reason: "The five stages of crisis are Cumulation, Outbreak, Chaos, Equalization, and Mitigation. Stagnation is not listed as a distinct stage."
+    },
+    {
+        question: "According to the material, what is a common element of financial crises?",
+        options: [
+            "a) Limited government intervention",
+            "b) Minor disruptions in financial intermediation",
+            "*c) Large scale government support (in the form of liquidity support and recapitalization)",
+            "d) Small scale balance sheet problems"
+        ],
+        reason: "The material explicitly highlights 'large scale government support' as a common element. (ALERT! LEAKED QUESTION)"
+    },
+    {
+        question: "In the Altman Z-Score model for bankruptcy prediction, what Z-Score range indicates the 'safe zone'?",
+        options: [
+            "a) Lower than 1.8",
+            "b) Between 1.8 and 3.0",
+            "*c) More than 3.0",
+            "d) Exactly 1.8"
+        ],
+        reason: "The text states: 'more than 3.0 - safe zone'. (Będzie na teście)"
+    },
+    {
+        question: "How is 'liquidity' defined in the context of a company's financial health?",
+        options: [
+            "a) The ability to generate high profits",
+            "b) The total value of a company's assets",
+            "*c) The possibility to cover current obligations",
+            "d) The total amount of a company's debt"
+        ],
+        reason: "The text defines liquidity as 'possibility to cover current obligations'. (Mam przeczucie, że może być pytanie o definicje liquidity)"
+    },
+    {
+        question: "What financial phenomenon is frequently observed at the start of almost every crisis, according to the text?",
+        options: [
+            "a) A rapid decline in GDP growth",
+            "b) Stable credit volume",
+            "*c) A rapid growth of credit",
+            "d) A high rate of unemployment"
+        ],
+        reason: "The material states: 'Almost every crisis started with a rapid growth of credit!'"
+    },
+    {
+        question: "What is the core idea of Hyman Minsky's Financial Instability Hypothesis?",
+        options: [
+            "a) Financial systems are inherently stable and self-correcting.",
+            "b) Government intervention is always beneficial for financial stability.",
+            "*c) Financial systems are inherently unstable, with strong growth phases increasing risk-taking.",
+            "d) Economic crises are primarily caused by external supply shocks."
+        ],
+        reason: "Minsky's hypothesis posits that the financial system is 'inherently unstablle', with growth leading to increased risk and leverage."
+    },
+    {
+        question: "What is the 'Golden Rule' in the context of local government finance?",
+        options: [
+            "a) Capital revenues should be higher than capital expenditures.",
+            "*b) Current revenues should be higher than current expenditures.",
+            "c) Total revenues should always balance total expenditures.",
+            "d) Debt should never exceed 10% of total revenues."
+        ],
+        reason: "The text specifies: 'Golden Rule Current revenues should be higher than current expenditures'."
+    },
+    {
+        question: "Which of the following best describes a 'Black Swan' event, according to the text?",
+        options: [
+            "a) A predictable economic slowdown.",
+            "b) A minor financial fluctuation.",
+            "*c) A rare, difficult to predict, world-changing event with serious implications.",
+            "d) A financial crisis intentionally caused by government policy."
+        ],
+        reason: "A Black Swan is defined as 'a world-chaning event that is rare and difficult to predict, but it has serious implication'."
+    },
+    {
+        question: "Which of the following is listed as a potential side effect of quantitative easing (QE)?",
+        options: [
+            "a) Significant reduction in private sector debt.",
+            "b) A decrease in demand for commodities.",
+            "*c) Continued survival of zombie businesses.",
+            "d) A reduced demand for assets."
+        ],
+        reason: "The text lists 'continued survival of zombie businesses' as a side effect of QE."
+    },
+    {
+        question: "Which option correctly presents the GDP Equation given in the text?",
+        options: [
+            "a) GDP = C + I + E + G",
+            "*b) GDP = Private SECTOR [ C consumption + I investment + E export netto ] + Government (Expenditures of public sector)",
+            "c) GDP = C + G + T",
+            "d) GDP = I + E + G"
+        ],
+        reason: "The material explicitly provides the GDP equation as 'GDP = Private SECTOR [ C consumtipn + I investment + E export netto ] + Goverment (Expenditures of public sector)'."
+    },
+    {
+        question: "Which of the following is NOT one of the four criteria used to identify fiscal distress episodes?",
+        options: [
+            "a) Debt default or restructuring",
+            "b) Sovereign bond yield pressure",
+            "c) Large IMF-supported programme",
+            "*d) Decreased public debt"
+        ],
+        reason: "The four criteria are: debt default, bond yield pressure, IMF program, and excessive inflation. Decreased public debt would indicate an improvement, not distress."
+    },
+    {
+        question: "According to qualitative and judgmental analysis, which two types of financial crises are identified in the material?",
+        options: [
+            "a) Currency crisis and sudden stop crisis",
+            "*b) Debt crisis and banking crisis",
+            "c) Economic crisis and technological crisis",
+            "d) Business crisis and personnel crisis"
+        ],
+        reason: "The text lists 'debt crisis' and 'banking crisis' under qualitative and judgmental analysis for types of financial crises."
+    },
+    {
+        question: "What is the legal situation regarding local authority bankruptcy in the UK, according to the text?",
+        options: [
+            "a) They can formally declare bankruptcy, similar to US cities.",
+            "*b) They cannot go bankrupt, but issue a Section 114 notice in case of financial difficulty.",
+            "c) They are always bailed out by the central government without any internal action.",
+            "d) They manage financial difficulties solely through council tax rises."
+        ],
+        reason: "The text clearly states: 'In the U.K. local authorities cannot go bankrupt' and mentions the Section 114 notice."
+    },
+    {
+        question: "According to T. Laitinen's stages of company financial distress, what characterizes the 'Final stage'?",
+        options: [
+            "a) Only a decrease in profitability.",
+            "b) Decrease in profitability and increased leverage.",
+            "*c) Decrease in profitability, increased leverage (debt ratio), and decreased liquidity.",
+            "d) Increased profitability and decreased leverage."
+        ],
+        reason: "The text describes the 'Final stage' as 'decrease of profitability, increased leverage (debt ratio) and decreased liquidity'."
+    },
+    {
+        question: "According to J.M. Keynes, what is the main cause of economic crises and the proposed anti-crisis policy?",
+        options: [
+            "a) Excessive growth in money supply; Passive stabilization policy.",
+            "*b) Insufficient aggregate demand (demand shock); Stimulating aggregate demand through expansive monetary and fiscal policy.",
+            "c) Technological cycle; Moving away from capitalism.",
+            "d) Oversupply; Waiting for prices to adjust."
+        ],
+        reason: "For Keynes, the material indicates: 'Insufficient aggregate demand (demand shock) - Stimulating aggregate demand though expansive monetary and fiscal policy, expenditure growth'."
+    },
+    {
+        question: "What is the definition of an 'Asset Bubble' according to the text?",
+        options: [
+            "a) A sudden decrease in asset prices caused by market panic.",
+            "*b) The price of an asset rising significantly over its intrinsic value, caused by excessive buying unrelated to fundamental factors.",
+            "c) A stable and predictable increase in asset prices over time.",
+            "d) A government program to support failing assets."
+        ],
+        reason: "The material defines an Asset Bubble as 'Price of an asset rises significantly over its intrinsic value Sudden increase in prices caused by excessive buying, unrelated to any fundamental factors'."
+    },
+    {
+        question: "Which of the following is NOT one of the traditional 4 stages of crisis according to the traditional approach?",
+        options: [
+            "a) Incubation",
+            "b) Maturity",
+            "c) Repercussions on financial flows and trust",
+            "*d) Recovery"
+        ],
+        reason: "The traditional 4 stages are Incubation, Maturity, Repercussions on financial flows and trust, and Consequences on stakeholders. Recovery is not listed as one of these initial stages."
+    },
+    {
+        question: "What does a 'Ponzi scheme' rely on to appear sustainable?",
+        options: [
+            "a) High-value asset sales.",
+            "b) Robust product development.",
+            "*c) Most investors not demanding full repayment.",
+            "d) Government subsidies."
+        ],
+        reason: "A Ponzi scheme creates an 'illusion of a sustainable business as long as most of the investors do not demand full repayment'."
+    },
+    {
+        question: "Which economic school advocates for 'Laissez faire' as a policy leading to agricultural development?",
+        options: [
+            "a) Mercantilism",
+            "*b) Physiocrats",
+            "c) Classics",
+            "d) Monetarists"
+        ],
+        reason: "The table lists Physiocrats as advocating 'Laissez faire, as a policy leading especially to the development of agriculture'."
+    },
+    {
+        question: "If an economy is more open, how does it affect the probability of fiscal distress?",
+        options: [
+            "*a) The probability of the crisis is lower.",
+            "b) The probability of the crisis is higher.",
+            "c) It has no effect.",
+            "d) It's inversely related to GDP growth."
+        ],
+        reason: "The text states: 'if the economy is more open, the probability of the crisis is lower'."
+    },
+    {
+        question: "What do foreign exchange reserves typically include?",
+        options: [
+            "a) Domestic government bonds and real estate.",
+            "b) Only physical gold.",
+            "*c) Foreign banknotes, foreign bank deposits, and foreign government securities.",
+            "d) Equity shares in foreign companies."
+        ],
+        reason: "The text lists: 'FX reserves include foreign banknotes, foreign bank deposits, foreign treasurry bills, and short and logng-term foreign government securities'."
+    },
+    {
+        question: "What is the meaning of 'Terms of trade 103'?",
+        options: [
+            "a) Import prices have risen by 3% relative to export prices.",
+            "*b) Prices of exports have risen by 3% in relation to prices of imports since the base period.",
+            "c) Both export and import prices have fallen by 3%.",
+            "d) The trade balance has improved by 3%."
+        ],
+        reason: "The text explains: 'Terms of trade 103 means that prices of exports have risen by 3% in relations to prices of imports since the base period'."
+    },
+    {
+        question: "Which specific financial institutions collapsed during the Global Financial Crisis of 2008, as mentioned?",
+        options: [
+            "a) Goldman Sachs and Morgan Stanley",
+            "*b) Bear Stearns and Lehman Brothers",
+            "c) JPMorgan Chase and Bank of America",
+            "d) Merrill Lynch and Citigroup"
+        ],
+        reason: "The text mentions 'The collapse of Bear Stearns, Lehman Brothers'."
+    },
+    {
+        question: "What is 'Stagflation' defined as?",
+        options: [
+            "a) High GDP growth and low inflation.",
+            "b) Negative GDP growth and low inflation.",
+            "*c) Negative or low GDP growth and high inflation.",
+            "d) High GDP growth and high inflation."
+        ],
+        reason: "Stagflation is defined as 'negative or low GDP growth and high inflation'."
+    },
+    {
+        question: "Which of the following is typically associated with a financial crisis?",
+        options: [
+            "a) Stable credit volume and asset prices.",
+            "b) Mild disruptions in financial intermediation.",
+            "*c) Large scale balance sheet problems.",
+            "d) Reduced need for external financing."
+        ],
+        reason: "The text lists 'large scale balance sheet problems' as one of the phenomena associated with a financial crisis."
+    },
+    {
+        question: "A 'sudden stop crisis' refers to what specific event?",
+        options: [
+            "a) A sudden increase in domestic consumption.",
+            "b) A rapid rise in export volumes.",
+            "*c) A fall in international capital inflows.",
+            "d) A government decision to stop all foreign trade."
+        ],
+        reason: "The text defines sudden stop as 'fall in international capital inflows'."
+    },
+    {
+        question: "Which of the following is NOT a negative effect of a Financial Crisis listed in the material?",
+        options: [
+            "a) Higher cost of credit.",
+            "b) Falling asset prices weaken bank balance sheets.",
+            "c) A drop in consumer spending/aggregate demand.",
+            "*d) A desire for *lower* lending of bank liquidity."
+        ],
+        reason: "The text lists 'a desire to maintain higher lending of bank liquidity' (implying a pressure, not a decrease) as an effect, and the other options as negative effects."
+    },
+    {
+        question: "What is a 'bailout' defined as?",
+        options: [
+            "a) An act of liquidating a failing business.",
+            "b) A government policy to increase competition in a market.",
+            "*c) An act of giving financial assistance to a failing business or economy to save it from collapse.",
+            "d) A process of increasing taxes to reduce public debt."
+        ],
+        reason: "A bailout is defined as 'an act of giving financial assistance to a failing business or economy to save it from collapse'."
+    },
+    {
+        question: "What is the relationship between 'own revenues' and 'financial independence' for a local government?",
+        options: [
+            "a) An increase in own revenues means lower financial independence.",
+            "*b) An increase of own revenues means a higher financial independence.",
+            "c) There is no direct relationship.",
+            "d) Financial independence is solely determined by central government aid."
+        ],
+        reason: "The text states: 'An increase of own revenues means a higher financial independence'."
+    },
+    {
+        question: "Which factor accounts for the largest percentage in Moody's rating of cities?",
+        options: [
+            "a) Economic situation",
+            "b) Law and autonomy",
+            "*c) Finances and debt",
+            "d) Government and management"
+        ],
+        reason: "Both 'finances and debt' and 'government and management' are weighted at 30%, which is the largest single percentage."
+    },
+    {
+        question: "What is the primary cause of an 'Inefficiency Crisis' in a company?",
+        options: [
+            "*a) Rising production costs.",
+            "b) High production and low demand.",
+            "c) An inefficient product compared to competitors.",
+            "d) Lack of planning and innovations."
+        ],
+        reason: "The text lists 'Inefficiency Crisis -> rising production costs'."
+    },
+    {
+        question: "Which of the following is NOT listed as an external factor that might contribute to a crisis in the business sector nowadays?",
+        options: [
+            "a) Regional wars",
+            "b) Natural disasters",
+            "c) Tariffs",
+            "*d) Internal management restructuring"
+        ],
+        reason: "Internal management restructuring is an internal factor. The others are listed as external factors."
+    },
+    {
+        question: "What does a negative 'Net Working Capital' imply for a company?",
+        options: [
+            "a) Current assets are higher than current liabilities.",
+            "*b) Fixed assets are financed by short term liabilities.",
+            "c) Long term capital is higher than fixed assets.",
+            "d) The company has excessive liquidity."
+        ],
+        reason: "The text states: 'Fixed assets financed by short term liabilites means that u have a negative Net Working Capital'."
+    },
+    {
+        question: "What is a 'Personnel Crisis'?",
+        options: [
+            "a) A crisis caused by technological failure.",
+            "b) A crisis related to the overall business model.",
+            "*c) A type of crisis listed among general categories (like Financial, Economic).",
+            "d) A crisis stemming from natural events."
+        ],
+        reason: "Personnel Crisis is explicitly listed under 'Types of crisis'."
+    },
+    {
+        question: "Which anti-crisis policy is associated with Mercantilism?",
+        options: [
+            "*a) Supporting foreign trade.",
+            "b) Laissez faire.",
+            "c) Free market.",
+            "d) Increasing consumption by non-producers."
+        ],
+        reason: "Mercantilism is linked to 'Supporting foreign trade'."
+    },
+    {
+        question: "According to the text, what did K. Marx identify as causes of crisis?",
+        options: [
+            "a) Insufficient consumption and oversupply.",
+            "b) Excessive credit expansion.",
+            "*c) Technological cycle, disproportionality crises, long-term decline in the rate of profit.",
+            "d) Unexpected, too restrictive monetary policy."
+        ],
+        reason: "K. Marks is linked to 'Technological cycle, disproportionality crises, long-term decline in the rate of profit'."
+    },
+    {
+        question: "What is the primary role of the International Monetary Fund (IMF) in relation to fiscal distress?",
+        options: [
+            "a) To provide military aid to distressed countries.",
+            "b) To regulate international trade agreements.",
+            "*c) To support countries experiencing fiscal difficulties through large-scale programs.",
+            "d) To directly control a nation's foreign exchange reserves."
+        ],
+        reason: "A 'large IMF-supported programme' is one of the criteria to capture fiscal distress episodes."
+    },
+    {
+        question: "Which of the following is an advantage of foreign exchange reserves?",
+        options: [
+            "a) Direct investment into domestic infrastructure.",
+            "b) Eliminating the need for national taxation.",
+            "*c) Signaling indicator for credit risk agencies.",
+            "d) Unlimited expansion of domestic credit."
+        ],
+        reason: "The text lists 'Signaling indicator - Credit risk agencies and internatonal organisations use ratios of reserves to other Economic catoegories to assess a country's external vulnerability'."
+    },
+    {
+        question: "What is the recommended coverage for reserves, according to some economies?",
+        options: [
+            "a) At least one month of exports.",
+            "b) Enough to cover 100% of GDP.",
+            "*c) At least three months of imports.",
+            "d) Sufficient to repay all national debt immediately."
+        ],
+        reason: "The text notes: 'Some economies claim that reserves should cover at least three months of imports'."
+    },
+    {
+        question: "What was a significant consequence of the 2008 Global Financial Crisis in the US, as mentioned?",
+        options: [
+            "a) A rapid increase in home ownership.",
+            "*b) 4 to 6 Million US residents losing their homes.",
+            "c) A strengthening of credit rating agencies' reputations.",
+            "d) Increased deregulation in the financial sector."
+        ],
+        reason: "The text highlights: '4 to 6 Million US residents losing their homes'."
+    },
+    {
+        question: "What does 'International Contagion' refer to in the context of the 2008 GFC?",
+        options: [
+            "a) The spread of infectious diseases.",
+            "*b) The spread of the crisis from one country/region to others (e.g., Europe and Asia).",
+            "c) The rapid growth of international trade.",
+            "d) The spread of speculative investment practices."
+        ],
+        reason: "The text lists 'International Contagion - Europe and Asia' under the 2008 GFC consequences."
+    },
+    {
+        question: "According to the New Keynesian school, what intensifies recessions?",
+        options: [
+            "a) Excessive growth in money supply.",
+            "b) Supply shocks through investments.",
+            "*c) Stiffness of prices and wages, and risk aversion.",
+            "d) Nationwide elections."
+        ],
+        reason: "New KEYNESIAN school states: 'recessions are intensified by the stiffness of prices and wages, and risk aversion'."
+    },
+    {
+        question: "What is a 'debt crisis' specifically about?",
+        options: [
+            "a) A crisis caused by a surge in private consumer loans.",
+            "b) A situation where banks refuse to lend money.",
+            "*c) Unwillingness or the inability of governments to repay debt.",
+            "d) A general economic slowdown due to high household debt."
+        ],
+        reason: "Debt crisis is defined as 'unwillingnes or the inability of governments to repay debt'."
+    },
+    {
+        question: "What is a 'currency crisis' also called?",
+        options: [
+            "a) Fiscal crisis",
+            "*b) BoP crisis (Balance of Payment Crisis)",
+            "c) Stagflation crisis",
+            "d) Liquidity crisis"
+        ],
+        reason: "Currency crisis is 'also called BoP crassis - Balance of Payment Crisis'."
+    },
+    {
+        question: "What is 'insolvency' in the context of a company?",
+        options: [
+            "a) The company has very high profits.",
+            "*b) The company cannot repay its debt.",
+            "c) The company has too much cash.",
+            "d) The company's assets are greater than its liabilities."
+        ],
+        reason: "The text states: 'If we cannot repay our debt there is insolvency'."
+    },
+    {
+        question: "What does 'Current expenditures' of local government typically include?",
+        options: [
+            "a) Investments to build new roads.",
+            "*b) Wages.",
+            "c) Selling municipal assets.",
+            "d) Income from taxes."
+        ],
+        reason: "The text explicitly states: 'Current expenditures (wages)'."
+    },
+    {
+        question: "Which econometric analysis method is mentioned for modeling crisis (Yes/No)?",
+        options: [
+            "a) Regression analysis",
+            "*b) Logistic regression",
+            "c) Time series analysis",
+            "d) Factor analysis"
+        ],
+        reason: "The text states: 'We use logistic regression to model crisis'."
+    },
+    {
+        question: "What is the primary aim of 'Crisis Management'?",
+        options: [
+            "a) To solely react to crises after they occur.",
+            "b) To ignore crisis situations hoping they resolve themselves.",
+            "*c) Aimed at prevention, survival, and successful outcomes of crisis situations.",
+            "d) To maximize profits during periods of instability."
+        ],
+        reason: "Crisis Management 'is aimed at prevention, survival, successful outcomes'."
+    },
+    {
+        question: "What is an 'Economic Crisis' primarily defined as?",
+        options: [
+            "a) A sudden stock market crash.",
+            "*b) A periodic economic slowdown.",
+            "c) A disruption in financial markets only.",
+            "d) A situation of hyperinflation."
+        ],
+        reason: "Economic Crisis is defined as 'periodic economic slowdown'."
+    },
+    {
+        question: "According to M. Kalecki, what was the cause of crisis, and what was his proposed policy?",
+        options: [
+            "a) Insufficient aggregate demand; Stimulating demand.",
+            "*b) Policy of balancing the budget under pressure from 'industry leaders' during the boom; Policy of expansion of state spending.",
+            "c) Excessive credit expansion; Control of credit during the boom.",
+            "d) Decreasing marginal productivity; Lower wages."
+        ],
+        reason: "M. Kalecki: 'Policy of balancing the budget under pressure from 'industry leaders' during the boom - Policy of expansion of state spending'."
+    },
+    {
+        question: "What are 'Risky assets' characterized by?",
+        options: [
+            "a) Low price volatility and guaranteed returns.",
+            "*b) Significant price volatility and a higher potential for both gains and losses.",
+            "c) Investments primarily in government bonds.",
+            "d) Only investments that yield consistent income."
+        ],
+        reason: "Risky assets are defined as 'investments, like stocks and commodities, that have significant price volatility and a higher potential for both gains and losses'."
+    },
+    {
+        question: "Which of the following is a criterion for identifying fiscal distress episodes related to government debt?",
+        options: [
+            "a) Increased government revenue.",
+            "*b) Debt default or restructuring.",
+            "c) Decreased sovereign bond yields.",
+            "d) Stable inflation rates."
+        ],
+        reason: "One of the criteria is 'debt default or restructuring'."
+    },
+    {
+        question: "How does 'higher GDP growth' affect the probability of fiscal distress?",
+        options: [
+            "a) It increases the probability.",
+            "*b) It lowers the probability.",
+            "c) It has no effect.",
+            "d) It always leads to a currency crisis."
+        ],
+        reason: "The text states: 'if the gdp growth is higher, the probability of the crisis is lower'."
+    },
+    {
+        question: "What does the 'House money effect' suggest about risk-taking?",
+        options: [
+            "a) People become more risk-averse after a financial gain.",
+            "*b) Receiving a higher gain from previous investments makes one more likely to accept financial risks.",
+            "c) It encourages conservative investment strategies.",
+            "d) It only applies to real estate investments."
+        ],
+        reason: "The text explains: 'if you receive a higher gain from previous investments you are more likely to accept financial risks'."
+    }
+];
+
+        var maxQuestions = questions.length;
+        var answered = 0;
+
+        function learn() {
+            randomQuestionId = 0;
+            lastWrongAnsweredId = -1;
+            createQuestionNumberArray();
+            console.log(questionNumberArray);
+
+            document.getElementById("selectMode").style = "display: none;";
+            document.getElementById("modeDiv").classList.add("questionContainer");
+            loadLearnQuestion();
+        }
+
+
+        function test() {
+            answered = 0;
+            randomQuestionId = 0;
+            lastWrongAnsweredId = -1;
+            document.getElementById("selectMode").style = "display: none;";
+            document.getElementById("modeDiv").innerHTML = "";
+            numberofQuestions = prompt("Podaj liczbę pytań testowych:");
+            document.getElementById("modeDiv").classList.add("questionContainer");
+            document.getElementById("main").classList.remove("main");
+            document.getElementById("main").classList.add("testMain");
+            loadTestQuestions();
+        }
+        function checkLearnAnswer() {
+            var selectedAnswers = [];
+            ["a", "b", "c"].forEach(element => {
+                var input = document.getElementById(element);
+                if (input.checked) {
+                    selectedAnswers.push(document.getElementById(element).value);
+                }
+            });
+            var goodAnswers = [];
+            questions[randomQuestionId].options.forEach(element => {
+                if (element.slice(0, 2).includes("*")) {
+                    goodAnswers.push(element.slice(0, 2));
+                }
+            });
+            console.log(goodAnswers);
+            console.log(selectedAnswers);
+            if (selectedAnswers.length == goodAnswers.length) {
+                if (goodAnswers.every(r => selectedAnswers.includes(r))) {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                    console.log("aaa");
+                    answered += 1;
+                    lastWrongAnsweredId = -1;
+                }
+                else {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: darkred;";
+                    });
+                    goodAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        console.log(element);
+                        var input = document.querySelector("label[for=" + element + "]");
+                        console.log(input);
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                    lastWrongAnsweredId = randomQuestionId;
+                }
+            }
+            else {
+                selectedAnswers.forEach(element => {
+                    element = element.replace("*", "").replace(")", "").replace(" ", "");
+                    console.log(element);
+                    var input = document.querySelector("label[for=" + element + "]");
+                    console.log(input);
+                    if (input != undefined)
+                        input.style = "color: darkred;";
+                });
+                goodAnswers.forEach(element => {
+                    element = element.replace("*", "").replace(")", "").replace(" ", "");
+                    console.log(element);
+                    var input = document.querySelector("label[for=" + element + "]");
+                    console.log(input);
+                    if (input != undefined)
+                        input.style = "color: green; font-weight: bold;";
+                });
+                lastWrongAnsweredId = randomQuestionId;
+            }
+            document.getElementById("checkme").style = "display: none;";
+            document.getElementById("modeDiv").innerHTML += "<p>" + questions[randomQuestionId].reason + "</p>";
+            document.getElementById("modeDiv").innerHTML += "<button class='btn btn-secondary float-end' onclick='loadLearnQuestion()'>Idź dalej!</button>";
+            selectedAnswers.forEach(element => {
+                element = element.replace("*", "").replace(")", "").replace(" ", "");
+                document.getElementById(element).checked = true;
+            });
+        }
+
+        function loadLearnQuestion() {
+            document.getElementById("modeDiv").innerHTML = "";
+            if (selectRandomQuestionId(questionNumberArray, lastWrongAnsweredId)) {
+                document.getElementById("modeDiv").innerHTML = "<div class='progress' role='progressbar' aria-valuenow='" + answered + "' aria-valuemin='0' aria-valuemax='" + maxQuestions + "'><div class='progress-bar' style='width: " + (answered * (100 / maxQuestions)) + "%'></div></div><br><p>" + questions[randomQuestionId].question + "</p><input type='checkbox' value='" + questions[randomQuestionId].options[0].slice(0, 2) + "' id='a'><br><label for='a'>" + questions[randomQuestionId].options[0].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[1].slice(0, 2) + "' id='b'><br><label for='b'>" + questions[randomQuestionId].options[1].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[2].slice(0, 2) + "' id='c'><br><label for='c'>" + questions[randomQuestionId].options[2].slice(3) + "</label><br><br><hr><button id='checkme' class='btn btn-secondary float-end' onclick='checkLearnAnswer()'>Zatwierdź odpowiedzi</button>";
+            }
+            else {
+                document.getElementById("modeDiv").innerHTML = "<div class='text-center'><h1>Uczyłeś się już wszystkiego!</h1><button class='btn btn-secondary' onclick='window.location.href=window.location.href'>Wróć do menu głównego</button></div>";
+            }
+        }
+
+        function checkTestAnswers() {
+            var questionForms = document.querySelectorAll(".question");
+            var answeredGood = 0;
+            for (var i = 0; i < questionForms.length; i++) {
+                var questionId = questionForms[i].querySelector("input[type='hidden']").value;
+
+                var selectedAnswers = [];
+
+                ["a" + questionId, "b" + questionId, "c" + questionId].forEach(element => {
+                    var input = questionForms[i].querySelector("#" + element);
+                    if (input.checked) {
+                        selectedAnswers.push(input.value);
+                    }
+                });
+                var goodAnswers = [];
+                questions[questionId].options.forEach(element => {
+                    if (element.slice(0, 2).includes("*")) {
+                        goodAnswers.push(element.slice(0, 2));
+                    }
+                });
+
+                if (selectedAnswers.length == goodAnswers.length) {
+                    if (goodAnswers.every(r => selectedAnswers.includes(r))) {
+                        selectedAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: green; font-weight: bold;";
+                            answeredGood += 1;
+                        });
+                    }
+                    else {
+                        selectedAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: darkred;";
+                        });
+                        goodAnswers.forEach(element => {
+                            element = element.replace("*", "").replace(")", "").replace(" ", "");
+                            var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                            if (input != undefined)
+                                input.style = "color: green; font-weight: bold;";
+                        });
+                    }
+                }
+                else {
+                    selectedAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                        if (input != undefined)
+                            input.style = "color: darkred;";
+                    });
+                    goodAnswers.forEach(element => {
+                        element = element.replace("*", "").replace(")", "").replace(" ", "");
+                        var input = questionForms[i].querySelector("label[for=" + element + questionId + "]");
+                        if (input != undefined)
+                            input.style = "color: green; font-weight: bold;";
+                    });
+                }
+            }
+            document.getElementById("modeDiv").innerHTML += "<h1>Gratulacje! Uzyskałeś wynik " + answeredGood + "/" + numberofQuestions + " (" + (answeredGood / numberofQuestions) * 100 + "%)</h1><br><button class='btn btn-secondary' onclick='window.location.href=window.location.href'>Wróć do menu głównego</button>";
+            document.getElementById("testcheck").style = "display: none;";
+        }
+
+        function loadTestQuestions() {
+            createQuestionNumberArray();
+            console.log(numberofQuestions);
+            for (var i = 0; i < numberofQuestions; i++) {
+                if (selectRandomQuestionId(questionNumberArray, lastWrongAnsweredId)) {
+                    document.getElementById("modeDiv").innerHTML += "<div class='question'><p>" + questions[randomQuestionId].question + "</p><input type='checkbox' value='" + questions[randomQuestionId].options[0].slice(0, 2) + "' id='a" + randomQuestionId + "'><label for='a" + randomQuestionId + "'>" + questions[randomQuestionId].options[0].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[1].slice(0, 2) + "' id='b" + randomQuestionId + "'><label for='b" + randomQuestionId + "'>" + questions[randomQuestionId].options[1].slice(3) + "</label><br><br><input type='checkbox' value='" + questions[randomQuestionId].options[2].slice(0, 2) + "' id='c" + randomQuestionId + "'><label for='c" + randomQuestionId + "'>" + questions[randomQuestionId].options[2].slice(3) + "</label><input type='hidden' value='" + randomQuestionId + "'></div><br><hr>";
+                }
+            }
+            document.getElementById("modeDiv").innerHTML += "<br><br><button class='btn btn-secondary' id='testcheck' onclick='checkTestAnswers()'>Sprawdź test</button>";
+        }
+
+        function createQuestionNumberArray() {
+            elementId = 0;
+            questions.forEach(element => {
+                questionNumberArray.push(elementId);
+                elementId++;
+            });
+        }
+
+        function selectRandomQuestionId(availableQuestions, lastWrongAnsweredId) {
+            if (lastWrongAnsweredId == randomQuestionId) {
+                return true;
+            }
+
+            if (availableQuestions.length === 0) {
+                return false;
+            }
+
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+
+            randomQuestionId = availableQuestions[randomIndex];
+            availableQuestions.splice(randomIndex, 1);
+            return true;
+        }
+    </script>
+</body>
+
+</html>
