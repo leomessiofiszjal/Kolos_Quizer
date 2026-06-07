@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEDEN Z CZACIKÓW. GRA O SKIP</title>
+    <!-- Import nowoczesnej czcionki -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #ec4899;
+            --bg-gradient: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
+            --text-light: #64748b;
+            --success: #10b981;
+            --success-bg: #d1fae5;
+            --error: #ef4444;
+            --error-bg: #fee2e2;
+            
+            --diff-easy: #10b981;
+            --diff-med: #f59e0b;
+            --diff-hard: #e11d48;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #ffffff;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 2.2em;
+            letter-spacing: 1px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #cbd5e1;
+            font-size: 0.95em;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        /* --- Przełącznik trybów głównych (Fiszki / Test) --- */
+        .mode-switch {
+            display: flex;
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            border-radius: 50px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .mode-switch button {
+            background-color: transparent;
+            color: #ffffff;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 1.05em;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+        }
+
+        .mode-switch button.active {
+            background-color: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* --- Przełącznik poziomu trudności w teście --- */
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .diff-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid transparent;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9em;
+            backdrop-filter: blur(5px);
+        }
+
+        .diff-btn.easy { border-color: var(--diff-easy); }
+        .diff-btn.medium { border-color: var(--diff-med); }
+        .diff-btn.hard { border-color: var(--diff-hard); }
+
+        .diff-btn.active.easy { background-color: var(--diff-easy); color: white; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); border-color: white;}
+        .diff-btn.active.medium { background-color: var(--diff-med); color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); border-color: white;}
+        .diff-btn.active.hard { background-color: var(--diff-hard); color: white; box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4); border-color: white;}
+
+        .diff-btn:hover { transform: translateY(-2px); }
+
+        .view-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Widok Fiszek --- */
+        .flashcard-container {
+            width: 100%;
+            max-width: 850px;
+            height: 450px;
+            perspective: 1200px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.1);
+            transform-style: preserve-3d;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            border-radius: 24px;
+        }
+
+        .flashcard.is-flipped { transform: rotateX(180deg); }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background-color: var(--card-bg);
+            border-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 50px;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 1.25em;
+            line-height: 1.6;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-front { font-weight: 600; font-size: 1.6em; color: var(--primary); }
+        .card-back { transform: rotateX(180deg); font-size: 1.1em; text-align: left; align-items: flex-start; justify-content: flex-start; }
+        .card-back b { color: var(--primary); }
+        .card-back ul { margin-top: 10px; padding-left: 20px; }
+        .card-back li { margin-bottom: 12px; }
+
+        .card-face::-webkit-scrollbar { width: 8px; }
+        .card-face::-webkit-scrollbar-track { background: transparent; }
+        .card-face::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+
+        .controls { display: flex; gap: 20px; align-items: center; margin-bottom: 25px; }
+
+        .action-btn {
+            background-color: var(--primary); color: white; border: none; padding: 14px 28px;
+            border-radius: 14px; font-size: 1.05em; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .action-btn:hover { background-color: var(--primary-hover); transform: translateY(-2px); }
+
+        .counter { font-size: 1.3em; font-weight: 800; color: #ffffff; min-width: 90px; text-align: center; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        .secondary-controls { display: flex; gap: 15px; }
+        .secondary-controls button { background-color: rgba(255,255,255,0.1); color: #ffffff; border: 2px solid rgba(255,255,255,0.4); padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .secondary-controls button:hover { background-color: #ffffff; color: var(--primary); border-color: #ffffff; }
+
+        /* --- Widok Testu --- */
+        .test-card {
+            background-color: var(--card-bg); border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 40px; width: 100%; max-width: 850px; margin-bottom: 25px; box-sizing: border-box;
+        }
+
+        .test-question { font-size: 1.4em; font-weight: 600; color: var(--primary); margin-bottom: 30px; text-align: center; }
+        .test-options { display: grid; grid-template-columns: 1fr; gap: 15px; }
+
+        .option-btn {
+            background-color: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; padding: 18px 25px;
+            font-size: 1.05em; text-align: left; cursor: pointer; transition: all 0.2s; color: var(--text-main);
+            line-height: 1.5; position: relative; display: flex; align-items: center;
+        }
+
+        .option-btn:hover:not(.disabled) { border-color: var(--primary); background-color: #eef2ff; transform: translateX(5px); }
+        .option-btn.disabled { cursor: default; }
+        .option-btn.correct { border-color: var(--success); background-color: var(--success-bg); color: #065f46; font-weight: 600; }
+        .option-btn.wrong { border-color: var(--error); background-color: var(--error-bg); color: #991b1b; }
+
+        /* --- Modal Obrazka --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(15, 23, 42, 0.9);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(5px);
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content { display: flex; flex-direction: column; align-items: center; gap: 25px; transform: scale(0.8) translateY(20px); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-content img { max-width: 90vw; max-height: 65vh; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); object-fit: contain; border: 4px solid #fff; }
+        .modal-close-btn { background-color: white; color: var(--primary); border: none; padding: 14px 40px; border-radius: 50px; font-size: 1.2em; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: 0.2s; }
+        .modal-close-btn:hover { transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <h1>JEDEN Z CZACIKÓW. GRA O SKIP</h1>
+    <div class="subtitle">Włącz mózg, wyłącz szum.</div>
+    
+    <div class="mode-switch">
+        <button id="tab-flashcards" class="active" onclick="setMode('flashcards')">Tryb Nauki</button>
+        <button id="tab-test" onclick="setMode('test')">Wyzwanie (Test)</button>
+    </div>
+
+    <!-- ==================== WIDOK FISZEK ==================== -->
+    <div id="flashcard-view" class="view-section">
+        <div class="subtitle" style="margin-top:-20px; margin-bottom: 20px;">Kliknij kartę lub wciśnij <b>Spację</b> by obrócić. Użyj <b>Strzałek</b> do nawigacji.</div>
+
+        <div class="flashcard-container" onclick="flipCard()">
+            <div class="flashcard" id="flashcard">
+                <div class="card-face card-front" id="card-front"></div>
+                <div class="card-face card-back" id="card-back"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="action-btn" onclick="prevCard()">&#8592; Poprzednie</button>
+            <div class="counter" id="counter">1 / 21</div>
+            <button class="action-btn" onclick="nextCard()">Następne &#8594;</button>
+        </div>
+
+        <div class="secondary-controls">
+            <button onclick="shuffleDeck()">Tasuj Pytania</button>
+            <button onclick="resetDeck()">Resetuj Kolejność</button>
+        </div>
+    </div>
+
+    <!-- ==================== WIDOK TESTU ==================== -->
+    <div id="test-view" class="view-section hidden">
+        
+        <!-- Selektor trudności -->
+        <div class="difficulty-selector">
+            <button id="btn-diff-easy" class="diff-btn easy active" onclick="setDifficulty('easy')">1 - Czacik</button>
+            <button id="btn-diff-med" class="diff-btn medium" onclick="setDifficulty('medium')">2 - Chłopak po technikum</button>
+            <button id="btn-diff-hard" class="diff-btn hard" onclick="setDifficulty('hard')">3 - Rayman</button>
+        </div>
+
+        <div class="test-card">
+            <div id="test-question" class="test-question">Ładowanie...</div>
+            <div id="test-options" class="test-options"></div>
+        </div>
+
+        <div class="controls">
+            <div class="counter" id="test-counter">1 / 21</div>
+            <button id="btn-next-test" class="action-btn" style="display:none;" onclick="nextTestQuestion()">Następne pytanie &#8594;</button>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL Z OBRAZKIEM ==================== -->
+    <div id="result-modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <img id="result-img" src="" alt="Wynik testu">
+            <button class="modal-close-btn" onclick="closeModal()">Rozumiem, jedziemy dalej</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // BAZA PYTAŃ Z PODZIAŁEM NA TRUDNOŚCI
+        // ==========================================
+        const rawQuizData = [
+            {
+                question: "1. Wyjaśnij podstawowe różnice w podejściu humanistycznym i technicznym do pojęcia inteligencja.",
+                flashcardAnswer: "<ul><li><b>Podejście humanistyczne:</b> Skupia się na świadomości i celowości. Zakłada, że nośnikiem umysłu może być wyłącznie żywy organizm.</li><li><b>Podejście techniczne:</b> Redukuje inteligencję do zdolności przetwarzania informacji i logiki. Zakłada, że proces logiczny jest niezależny od nośnika (mózg lub maszyna).</li></ul>",
+                testOptions: {
+                    easy: [
+                        { text: "Humanistyczne skupia się na organizmach żywych i świadomości, a techniczne traktuje to jako matematykę i przetwarzanie danych.", isCorrect: true },
+                        { text: "Humanistyczne uczy AI pisać wiersze, a techniczne każe AI kopać rowy na budowie.", isCorrect: false },
+                        { text: "Podejście techniczne sprawdza czy maszyna ma serce z metalu, a humanistyczne czy z drewna.", isCorrect: false },
+                        { text: "Różnica polega na tym, że techniczne używa Windowsa, a humanistyczne MacBooka.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Humanistyczne skupia się na żywym organizmie i świadomości, a techniczne na logice i przetwarzaniu danych.", isCorrect: true },
+                        { text: "Humanistyczne zakłada, że sztuczna inteligencja niedługo posiądzie emocje, a techniczne skupia się na kodzie C++.", isCorrect: false },
+                        { text: "Podejście humanistyczne ignoruje psychologię, a techniczne wymaga zbudowania idealnego chemicznego mózgu.", isCorrect: false },
+                        { text: "Oba podejścia opierają się na perceptronie, ale humanistyczne dotyczy warstw wejściowych, a techniczne wyjściowych.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Humanistyczne skupia się na świadomości i celowości organizmów żywych, a techniczne redukuje inteligencję do zdolności przetwarzania informacji i logiki układów.", isCorrect: true },
+                        { text: "Humanistyczne traktuje mózg jako w pełni mierzalną maszynę, a techniczne skupia się na symulowaniu emocji i budowie biologicznej sieci.", isCorrect: false },
+                        { text: "Obydwa podejścia zakładają, że sztuczna inteligencja zyska świadomość, ale różnią się jedynie w matematycznym zdefiniowaniu algorytmu.", isCorrect: false },
+                        { text: "Techniczne podejście bada inteligencję poprzez dogłębną analizę ludzkich zachowań, a humanistyczne wyłącznie przez abstrakcyjne modele matematyczne.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "2. Omów konstrukcję 3 warstwowego modelu inteligencji CHC.",
+                flashcardAnswer: "Model Cattell-Horn-Carroll posiada 3 warstwy:<br><ul><li><b>Warstwa I:</b> Wąskie zdolności (np. szybkość czytania).</li><li><b>Warstwa II:</b> Szerokie zdolności (np. inteligencja płynna i skrystalizowana).</li><li><b>Warstwa III:</b> Czynnik g (nadrzędny, ogólny czynnik inteligencji).</li></ul>",
+                testOptions: {
+                    easy: [
+                        { text: "Składa się z warstwy zdolności wąskich, szerokich oraz głównego czynnika inteligencji 'g'.", isCorrect: true },
+                        { text: "Ma trzy warstwy: podłogę, parter i strych.", isCorrect: false },
+                        { text: "Dzieli się na procesor główny, kartę graficzną i zasilacz.", isCorrect: false },
+                        { text: "Warstwy to: chłopska, rycerska i duchowna.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Posiada warstwę wąskich zdolności, szerokich zdolności i ogólny czynnik g.", isCorrect: true },
+                        { text: "Składa się z inteligencji emocjonalnej, logiki matematycznej i pamięci krótkotrwałej.", isCorrect: false },
+                        { text: "Wyróżnia: Analizę, Syntezę i Wnioskowanie.", isCorrect: false },
+                        { text: "Zbudowana jest z inteligencji płynnej na dole, sztucznej na środku i skrystalizowanej na górze.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Składa się z warstwy wąskich zdolności, warstwy szerokich zdolności (np. płynna i skrystalizowana) oraz nadrzędnego, ogólnego czynnika inteligencji 'g'.", isCorrect: true },
+                        { text: "Składa się z warstwy inteligencji emocjonalnej, analitycznej i przestrzenno-społecznej, bez wyraźnego nadrzędnego czynnika ogólnego.", isCorrect: false },
+                        { text: "Zakłada sztywny podział strukturalny wyłącznie na inteligencję płynną (biologiczną) i skrystalizowaną (wyuczoną) z pominięciem czynnika 'g'.", isCorrect: false },
+                        { text: "To 3-warstwowy model sieci neuronowej opisujący po kolei wejście, ukryte przetwarzanie logiczne oraz zmysłowe wyjście u człowieka.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "3. Wyjaśnij istotę konsensusu APA z 1996 r. i podaj przyjętą tam definicję inteligencji.",
+                flashcardAnswer: "<ul><li><b>Istota:</b> Reakcja na rasistowskie tezy z książki 'The Bell Curve', mająca oddzielić fakty od mitów politycznych.</li><li><b>Definicja:</b> Inteligencja to szeroka zdolność do rozumienia idei, adaptacji, uczenia się na błędach i myślenia.</li></ul>",
+                testOptions: {
+                    easy: [
+                        { text: "Potępia rasistowskie tezy z 'The Bell Curve' i definiuje inteligencję jako ogólną zdolność adaptacji i uczenia się.", isCorrect: true },
+                        { text: "To prawo ustalone przez ONZ, które zakazuje robotom krzywdzenia ludzi.", isCorrect: false },
+                        { text: "Udowadnia, że psy są mądrzejsze od kotów w każdym teście psychologicznym.", isCorrect: false },
+                        { text: "Konsensus zmuszający każdego do płacenia podatku od wysokiego poziomu IQ.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Reakcja na 'The Bell Curve', definiująca inteligencję jako zdolność uczenia się na błędach i adaptacji.", isCorrect: true },
+                        { text: "Potwierdza, że geny w 100% determinują inteligencję człowieka już w chwili narodzin.", isCorrect: false },
+                        { text: "Porozumienie informatyków ustalające, że sztuczna sieć to formalny odpowiednik umysłu ludzkiego.", isCorrect: false },
+                        { text: "Dokument, który nakazał usunięcie funkcji skokowej z klasycznych perceptronów na całym świecie.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Definiuje inteligencję jako szeroką zdolność adaptacji i uczenia się w bezpośredniej odpowiedzi na kontrowersyjne, rasistowskie tezy z książki 'The Bell Curve'.", isCorrect: true },
+                        { text: "Potwierdza tezy z książki 'The Bell Curve' o ogromnych, wrodzonych różnicach rasowych, definiując IQ jako absolutnie stałą cechę genetyczną.", isCorrect: false },
+                        { text: "Skupia się na zakazaniu przeprowadzania testów IQ w szkołach, twierdząc że zjawiska tego nie da się w ogóle zdefiniować i matematycznie zmierzyć.", isCorrect: false },
+                        { text: "Jest pierwszym inżynieryjnym porozumieniem w celu ostatecznego uznania AI (programu Deep Blue) za system formalnie równy biologicznemu myśleniu.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "4. Naszkicuj uproszczony schemat i wyjaśnij konstrukcję neuronu biologicznego.",
+                flashcardAnswer: "<ul><li><b>Dendryty:</b> wejścia odbierające sygnał.</li><li><b>Soma:</b> ciało (sumator) decydujący o przekazaniu sygnału.</li><li><b>Akson:</b> długi kabel, wyjście przekazujące sygnał.</li><li><b>Synapsy:</b> szczeliny łączące neurony, podstawa wagi i zapamiętywania.</li></ul>",
+                testOptions: {
+                    easy: [
+                        { text: "Sygnał wchodzi przez dendryty, trafia do somy, a wychodzi przez długi akson i szczeliny zwane synapsami.", isCorrect: true },
+                        { text: "Składa się z klawiatury, zasilacza z wiatrakiem i wychodzi przez monitor z HDMI.", isCorrect: false },
+                        { text: "Budują go wyłącznie krew, kości i białe krwinki.", isCorrect: false },
+                        { text: "Posiada magiczne czułki na głowie do odbierania sygnałów z kosmosu.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Zawiera odbierające dendryty, przetwarzającą somę, wysyłający akson i synapsy z wagami.", isCorrect: true },
+                        { text: "Sygnały odbierane są z zewnątrz przez akson, przetwarzane w elastycznych synapsach, a wysyłane przez dendryty.", isCorrect: false },
+                        { text: "Składa się wyłącznie z nieliniowej funkcji aktywacji biologicznej oraz sumatora chemicznego.", isCorrect: false },
+                        { text: "Ciało komórki to synapsa, która używa wstecznej propagacji biologicznej przez dendryt.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Sygnały odbierane są przez wejściowe dendryty, sumowane chemicznie w somie, a potem przekazywane jako wyjście wzdłuż aksonu i przez synapsy.", isCorrect: true },
+                        { text: "Sygnały odbierane są z zewnątrz przez akson, przetwarzane w elastycznych synapsach, a na koniec wysyłane do innych komórek przez dendryty.", isCorrect: false },
+                        { text: "Zbudowany jest w 100% z dendrytów pełniących naraz rolę wejścia i wyjścia dla sygnałów, z pominięciem zbędnego strukturalnie aksonu.", isCorrect: false },
+                        { text: "Ciało komórki (soma) działa w próżni jako izolowany i jedyny przekaźnik sygnałów między aksonami, ignorując procesy w dendrytach.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "5. Wyjaśnij rolę badań McCullocha i Pittsa w rozwoju AI.",
+                flashcardAnswer: "Udowodnili obliczeniową uniwersalność mózgu. Zbudowali matematyczny model neuronu na zasadzie 'wszystko albo nic' i dowiedli, że można taką siecią realizować operacje logiczne (równoważne z maszyną Turinga).",
+                testOptions: {
+                    easy: [
+                        { text: "Sformalizowali pierwszy prosty model neuronu i udowodnili, że sieć potrafi liczyć i operować matematyczną logiką.", isCorrect: true },
+                        { text: "Stworzyli z drewna pierwszego na świecie Terminatora z czerwoną żarówką w oku.", isCorrect: false },
+                        { text: "Napisali pierwszą wersję gry Minecraft symulując w niej działanie ludzkiego mózgu.", isCorrect: false },
+                        { text: "Odkryli, że komputer nigdy nie dorówna człowiekowi, bo ludzie lubią jeść pizzę.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Stworzyli abstrakcyjny model neuronu (wszystko albo nic) dowodząc zmechanizowania myślenia logicznego.", isCorrect: true },
+                        { text: "Byli to psychologowie, którzy odkryli uczenie ze wzmocnieniem na psach Pawłowa.", isCorrect: false },
+                        { text: "Zbudowali pierwszą 100-warstwową sieć splotową do wykrywania raka płuc u pacjentów.", isCorrect: false },
+                        { text: "Udowodnili, że sieci RNN nie mają szans przetrwać ze względu na eksplozję gradientu.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Sformalizowali logicznie model neuronu ('wszystko albo nic'), udowadniając po raz pierwszy, że mechaniczny system może realizować logiczne operacje równe mózgowi.", isCorrect: true },
+                        { text: "Prowadzili wczesne eksperymenty odkrywając fizjologiczną plastyczność mózgu i jako pierwsi w psychologii użyli określenia 'Deep Learning'.", isCorrect: false },
+                        { text: "Stworzyli pierwszy fizycznie działający, wielki komputer tranzystorowy oparty wyłącznie na wstecznej propagacji błędu wielowarstwowego.", isCorrect: false },
+                        { text: "Wykazali naukowo w swoim artykule, że wyższe procesy umysłowe są niemożliwe do opisania w języku logiki z racji ciągłego rozkładu emocji.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "6. Wyjaśnij istotę i rolę Perceptronu w rozwoju badań nad AI.",
+                flashcardAnswer: "Był to pierwszy sztuczny neuron posiadający <b>możliwość uczenia się</b> (automatyczna zmiana wag). Wywołał euforię. Rozwój został przerwany przez Minksy'ego, który udowodnił, że taki pojedynczy perceptron jest liniowy i nie radzi sobie z problemem XOR (Zima AI).",
+                testOptions: {
+                    easy: [
+                        { text: "Był pierwszym algorytmem umiejącym się uczyć, ale nie umiał uczyć się skomplikowanych rzeczy (jak problem XOR).", isCorrect: true },
+                        { text: "Był maszyną parową do robienia ubrań z zapamiętanym kształtem.", isCorrect: false },
+                        { text: "To nowoczesny system do generowania muzyki hip-hop z użyciem AI.", isCorrect: false },
+                        { text: "Oznacza model matematyczny, który zawsze się myli, ale robi to bardzo szybko.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Wzbogacił neuron o algorytm uczenia (dostrajania wag), ale jego liniowość (problem XOR) wywołała potem kryzys i Zimę AI.", isCorrect: true },
+                        { text: "Rozwiązał problem XOR używając propagacji wstecznej, ratując dziedzinę przed upadkiem.", isCorrect: false },
+                        { text: "Był pierwszą siecią rekurencyjną posiadającą bramki wejściowe dla wyłapywania pamięci.", isCorrect: false },
+                        { text: "Wykorzystywał od razu funkcję ReLU, dzięki czemu bez problemu poradził sobie z klasyfikacją 3D.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Był pierwszym modelem AI zdolnym do dostrajania wag (uczenia się), co wywołało euforię, lecz odkrycie jego liniowych ograniczeń (XOR) wywołało później Zimę AI.", isCorrect: true },
+                        { text: "To przełomowa praca Minsky'ego, która w końcu pokonała barierę logiki nieliniowej rozwiązując problem bramki XOR za pomocą wielowarstwowości.", isCorrect: false },
+                        { text: "Był czysto biologicznym i chemicznym eksperymentem udowadniającym sprzężenia zwrotne, stanowiącym wyłącznie humanistyczną ciekawostkę.", isCorrect: false },
+                        { text: "To potoczna nazwa skomplikowanego procesora matematycznego używanego we wczesnych modelach Deep Learningu na początku XXI wieku.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "7. Naszkicuj i opisz na wykresie klasyczny perceptron.",
+                flashcardAnswer: "<ul><li><b>Wejścia (X):</b> Odbierają dane.</li><li><b>Wagi (W) i Bias:</b> Siła i ważność połączeń z wejść.</li><li><b>Sumator:</b> Procesor dodający i mnożący wejścia z wagami.</li><li><b>Funkcja aktywacji:</b> Decyduje nieliniowo czy wysłać ostateczny wynik (prąd) na wyjście (Y).</li></ul>",
+                testOptions: {
+                    easy: [
+                        { text: "Zawiera po kolei wejścia sygnału, wagi ustalone przez algorytm, sumator, oraz decyzyjną funkcję aktywacji na końcu.", isCorrect: true },
+                        { text: "Składa się z dwóch kółek zębatych kręcących się w wodzie by generować prąd logistyczny.", isCorrect: false },
+                        { text: "Posiada twardy dysk do zapisu błędów i kartę sieciową do propagacji do internetu.", isCorrect: false },
+                        { text: "To wielki lejek, do którego wrzucasz liczby, a wypada usmażony kotlet.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Składa się z sygnałów wejściowych, połączonych z wagami synaptycznymi, układu sumującego, oraz wyjściowej funkcji aktywacji.", isCorrect: true },
+                        { text: "Zawiera warstwę wejściową, dwie warstwy ukryte z funkcją Sigmoidy i jednokierunkowe wyjście wsteczne.", isCorrect: false },
+                        { text: "W klasycznym ujęciu ma tylko wagi wejściowe, bez sumatora, od razu przechodząc do bramki zapominania.", isCorrect: false },
+                        { text: "Opiera się o sumator różniczkowy odejmujący od razu kary z zastosowaniem tzw. Early Stoppingu na wejściu.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Składa się kolejno z sygnałów wejściowych, przypisanych im wag wzmacniających, sumatora oraz decyzyjnej, nieliniowej funkcji aktywacji na wyjściu.", isCorrect: true },
+                        { text: "Posiada pojedyncze główne wejście, jest rozdzielany na liczne wagi synaptyczne, wpada do pętli pamięci w sumatorze i wypluwa sygnał liniowo.", isCorrect: false },
+                        { text: "To chemicznie modelowana architektura wewnątrzkomórkowa z tangensem, w 100% pomijająca potrzebę przypisywania wag w jakiejkolwiek formie.", isCorrect: false },
+                        { text: "Jest połączonym modelem matematycznym, który najpierw zapomina parametry w bramce zapominania, a dopiero potem sumuje ukryty stan wag.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "8. Wyjaśnij rolę funkcji transformacji w funkcjonowaniu sieci warstwowych.",
+                flashcardAnswer: "Jej rolą jest <b>wprowadzenie do modelu nieliniowości.</b> Bez funkcji aktywacji cały model (bez znaczenia jak głęboki) byłby czystą algebrą kurczącą się matematycznie do płaskiej, prostej regresji liniowej. Nie potrafiłby odróżnić np. psa od kota na zdjęciu.",
+                testOptions: {
+                    easy: [
+                        { text: "Jej najważniejszym zadaniem jest wprowadzenie nieliniowości, żeby sieć nie rozwiązywała zadań jak prosta linijka z matematyki.", isCorrect: true },
+                        { text: "Funkcja ta pilnuje, żeby komputer podczas obliczeń się za mocno nie nagrzał.", isCorrect: false },
+                        { text: "Rozdziela sprawiedliwie uśmiechy między wszystkie smutne neurony w warstwie.", isCorrect: false },
+                        { text: "Zastępuje rolę człowieka-programisty, ponieważ sama w locie pisze kod w Pythonie.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Wprowadza matematyczną nieliniowość do modelu. Bez niej wielowarstwowa sieć działałaby tylko jak płaska regresja liniowa.", isCorrect: true },
+                        { text: "Gwarantuje, że gradient nigdy nie zaniknie, poprzez ustawianie stałych wag w funkcji liniowej.", isCorrect: false },
+                        { text: "Jej zadaniem jest spłaszczenie odpowiedzi do jednej gęstej warstwy, by oszczędzać pamięć.", isCorrect: false },
+                        { text: "Służy do automatycznego wyliczania wektora błędu w metodzie propagacji wstecznej.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Głównie wprowadza matematyczną nieliniowość do systemu, pozwalając na rozwiązywanie silnie złożonych problemów, wykraczających poza płaską regresję liniową.", isCorrect: true },
+                        { text: "Pełni zadanie stałego regulowania tempa uczenia się sieci (poprzez parametr η), zabezpieczając sieć przed nadmiernym spadkiem pochodnej błędu.", isCorrect: false },
+                        { text: "Dba o to, by układ wag na siłę utrzymywał idealnie prostą, liniową strukturę zapobiegającą popularnemu przeuczeniu (overfitting) modeli głębokich.", isCorrect: false },
+                        { text: "Jest zautomatyzowanym procesem doboru wielkości poszczególnych warstw i węzłów pod kątem kompresji danych przed ich aktywacją na wyjściu.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "9. Wymień i podaj własności podstawowych funkcji transformacji stosowanych w neuronach.",
+                flashcardAnswer: "<ul><li><b>Skokowa:</b> Działa 0/1. Brak pochodnej (nie uczy się głęboko).</li><li><b>Sigmoida:</b> (0,1). Cierpi na potężny zanik gradientu na krańcach.</li><li><b>Tanh:</b> (-1, 1). Lepsza niż sigmoida, zbiega z zerem, ale dalej problem zaniku.</li><li><b>ReLU:</b> Przepuszcza na wprost wejścia >0, tnie ujemne na 0. Szybka, najpopularniejsza, ratuje gradient, jednak ujemne węzły w niej obumierają.</li></ul>",
+                testOptions: {
+                    easy: [
+                        { text: "To między innymi funkcja skokowa (zera lub jedynki), Sigmoida (łagodne S) oraz bardzo popularna funkcja ReLU.", isCorrect: true },
+                        { text: "To podstawowe funkcje szkolne: funkcja kwadratowa, funkcja dodawania i logarytm.", isCorrect: false },
+                        { text: "Funkcje dzielą się na: Czerwoną, Zieloną i Niebieską (RGB).", isCorrect: false },
+                        { text: "To: Funkcja Uśmiechu, Funkcja Łez i Funkcja Spania głębokiego.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Sigmoida jest stosowana na wyjściu by dać wynik od 0 do 1, Tanh od -1 do 1, a ReLU przepuszcza tylko dodatnie wartości ratując gradient.", isCorrect: true },
+                        { text: "Skokowa Heaviside'a jest najpopularniejsza z racji najlepszej pochodnej, a ReLU i Sigmoida cierpią na eksplodujący gradient.", isCorrect: false },
+                        { text: "Liniowa (Identity) zmusza sieć do bycia nieliniową, a tangens hiperboliczny zawsze zeruje wagi w pętli wstecznej.", isCorrect: false },
+                        { text: "Wszystkie z nich spłaszczają wprost odpowiedź wyłącznie od zakresu 0 do 1, nie akceptując żadnych liczb mniejszych od zera.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Skokowa (0/1), Sigmoida (0-1, zanika gradient), Tanh (-1 do 1) oraz najpopularniejsza dzisiaj ReLU (przepuszcza same dodatnie, bardzo obliczeniowo szybka).", isCorrect: true },
+                        { text: "Liniowa (na wyjście w ramach klasyfikacji), Sigmoidalna (-1 do 1, eliminuje problem uczenia), ReLU (od zera do jedynki do warstw wyjściowych).", isCorrect: false },
+                        { text: "ReLU (zakres ujemny odwraca na dodatni), Tanh (przesuwa w dół do ujemnych) oraz Skokowa (idealna na wejście obrazów dla wielkich sieci splotowych).", isCorrect: false },
+                        { text: "Funkcje różnią się w zasadzie wyłącznie nazwiskami twórców; każda z nich matematycznie i rygorystycznie wymusza dokładnie taki sam podział decyzyjny.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "10. Wymień i wyjaśnij podstawowe modele uczenia sieci neuronowych.",
+                flashcardAnswer: "<ul><li><b>Nadzorowane (z nauczycielem):</b> Posiadamy precyzyjne etykiety. Algorytm próbuje dorównać do narzuconego wyniku.</li><li><b>Nienadzorowane (bez nauczyciela):</b> Wrzucamy surowe dane. Algorytm szuka ukrytych korelacji i sam grupuje obiekty.</li><li><b>Ze wzmocnieniem (agenty):</b> Agent eksploruje. Za dobre decyzje dostaje Nagrodę, a za złe Karę.</li></ul>",
+                testOptions: {
+                    easy: [
+                        { text: "Wyróżniamy uczenie: z nauczycielem (wiemy jaki ma być wynik), bez nauczyciela (szuka na oślep) oraz ze wzmocnieniem (kary i nagrody jak w grze).", isCorrect: true },
+                        { text: "Dzielimy na: Uczenie Ranne dla studentów, Popołudniowe, oraz Uczenie na odległość.", isCorrect: false },
+                        { text: "Główne to uczenie za pomocą młotka i śrubokręta na twardym dysku twardym.", isCorrect: false },
+                        { text: "Większość sieci uczy się poprzez czytanie Wikipedii i pisanie wypracowań na papierze.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Istnieją tryby nadzorowane (z danymi etykietowanymi), nienadzorowane (grupowanie klastrów) oraz ze wzmocnieniem (środowisko nagród).", isCorrect: true },
+                        { text: "Z nauczycielem ignoruje pomyłki, bez nauczyciela nieużywa wag wejściowych, a ze wzmocnieniem opiera się na wstecznej propagacji biologicznej.", isCorrect: false },
+                        { text: "Do modeli należy propagacja w przód, propagacja w tył oraz model wstecznego rekursywnego sumatora z etykietami.", isCorrect: false },
+                        { text: "Modele nienadzorowane posiadają stałego nauczyciela, który karze model za przekroczenie minimum lokalnego gradientu.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Trzy gałęzie: Z nauczycielem (algorytm uczy się w oparciu o sztywne etykiety), bez nauczyciela (wyszukiwanie surowych wzorców) oraz ze wzmocnieniem (agenty i nagrody).", isCorrect: true },
+                        { text: "Z nauczycielem (wymuszające zjawisko uczenia na pamięć), nienadzorowane (tworzenie głębokich pętli) oraz oparte o losowość (gdzie kary losowo zerują węzły co epokę).", isCorrect: false },
+                        { text: "Uczenie płaskie (przy pojedynczej warstwie perceptronu), propagacyjne wstecz (w sieciach klasycznych) i optymalizacyjnie cykliczne w trudnych modelach genetycznych.", isCorrect: false },
+                        { text: "Z nauczycielami (metoda stosująca ustalone współczynniki uczenia gradientów) oraz swobodne (obliczanie pochodnych bezpośrednio w kierunku przodu bez błędów).", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "11. Wyjaśnij i zapisz matematycznie zasadę uczenia neuronu: perceptron learning rule.",
+                flashcardAnswer: "Wagi są zmieniane <b>tylko wtedy, gdy neuron popełni błąd</b>.<br><br>Wzór poprawki to: Δw = η * (d - y) * x<br>Gdzie: <b>η</b> to małe tempo uczenia, <b>d</b> pożądana odpowiedź, <b>y</b> to realny zły wynik, a <b>x</b> to wartość z wejścia.",
+                testOptions: {
+                    easy: [
+                        { text: "Perceptron zmienia swoje wagi (uczy się) tylko wtedy, kiedy się pomyli, mnożąc błąd przez małe tempo uczenia (eta).", isCorrect: true },
+                        { text: "Perceptron zawsze usuwa wszystkie dane i zaczyna od nowa, jeśli na sprawdzianie dostanie 1.", isCorrect: false },
+                        { text: "Polega to na zgadywaniu do skutku. Jeśli się nie uda, komputer zwalnia zegar procesora.", isCorrect: false },
+                        { text: "To zasada, w której neuron w nagrodę za dobre odpowiedzi powiększa czcionkę na monitorze.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Reguła ta modyfikuje wagi wejściowe Δw tylko i wyłącznie przy popełnionym błędzie, uwzględniając różnicę (d - y) oraz tempo uczenia η.", isCorrect: true },
+                        { text: "Uczy neuron poprzez ciągłe powiększanie wszystkich wag w sieci niezależnie od wyniku, wymuszając minimalizację pochodnych gradientu.", isCorrect: false },
+                        { text: "Zasada dba, by wagi uczone były bez nauczyciela metodą klastrów z użyciem wzoru Δw = (y + d) * η.", isCorrect: false },
+                        { text: "Algorytm aktualizujący sieć wyłącznie gdy jest 100% idealna, zapobiegając w ten sposób zapominaniu starych ścieżek z wagami.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Zasada mówiąca, że wagi koryguje się wyłącznie przy pomyłce na podstawie surowej różnicy z celem i wejściem, wg wzoru: Δw = η * (d - y) * x.", isCorrect: true },
+                        { text: "Algorytm aktualizujący parametry z każdym przejściem obwodu dla uniknięcia spłycania, polegający wprost na użyciu pochodnej d/dx: Δw = ∂L / ∂w.", isCorrect: false },
+                        { text: "Wzór z definicji obliczający całościowy błąd idąc wspak od samego końca w lewo, modyfikując w locie wartości tangensa dla wag według krzywej η.", isCorrect: false },
+                        { text: "Podejście klasyczne dla uczenia maszyn bez etykiet, które dostosowuje siłę ukrytego połączenia wyłącznie na podstawie stochastycznej amplitudy sygnału x.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "12. Wyjaśnij istotę w budowie modeli AI ogólnej zasady uczenia: Hebb learning rule.",
+                flashcardAnswer: "'Neurons that fire together, wire together' (Neurony odpalające równocześnie umacniają złącza). To nienadzorowana zasada biologiczna stosowana do budowy pamięci asocjacyjnej i powiązań skojarzeniowych. Model po prostu naturalnie wzmacnia tę wagę synapsy, na której jednocześnie często dochodzi do pobudzenia.",
+                testOptions: {
+                    easy: [
+                        { text: "Zasada mówiąca, że neurony, które 'błyskają' w tym samym czasie, łączą się ze sobą mocniej w przyjaźni.", isCorrect: true },
+                        { text: "To prawo głoszące, że im komputer jest cięższy fizycznie, tym ma wyższe IQ w oprogramowaniu.", isCorrect: false },
+                        { text: "Jeśli neuron nic nie robi przez godzinę, przechodzi automatycznie w tryb wygaszacza ekranu.", isCorrect: false },
+                        { text: "Metoda Hebbia polega na podlewaniu neuronów wodą by urosły do góry.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Opiera się na asocjacji w czasie – waga rośnie, jeśli na wejściu i na wyjściu synapsy jednocześnie pojawia się aktywny sygnał.", isCorrect: true },
+                        { text: "Polega na zmuszaniu neuronów do uczenia na pamięć z wykorzystaniem silnego gradientu wstecznego i metody Early Stopping.", isCorrect: false },
+                        { text: "Jest to zasada sztucznie gasząca najsilniejsze neurony poprzez losowe wypinanie 20% ich połączeń w każdej nowej epoce.", isCorrect: false },
+                        { text: "To algorytm stosowany w uczeniu ze wzmocnieniem, zmuszający agenty w grach do minimalizacji utraty nagrody z otoczenia.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Wzorowana na układzie nerwowym asocjacyjna reguła: 'neurony zgrane w czasie aktywacji utrwalają złącza', gdzie waga rośnie przy współwystępowaniu impulsów.", isCorrect: true },
+                        { text: "Całkowicie nadzorowany algorytm, gdzie wartość wagi drastycznie ulega obcięciu, aby za pomocą szumu w locie uniknąć przeuczenia perceptronu.", isCorrect: false },
+                        { text: "Zasada wymuszająca ujemne wagi w modelach RNN na ułamek sekundy przed sprzężeniem po to, aby ratować obwód przed eksplozją gradientu.", isCorrect: false },
+                        { text: "Metoda całkowicie odrzucająca jakiekolwiek relacje i korelacje przyczynowe, bazująca na statystycznym stochastycznym dodawaniu wag ślepego losu.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "13. Przedstaw i wyjaśnij konstrukcję sieci warstwowej jednokierunkowej.",
+                flashcardAnswer: "Sieć Feed-Forward (Klasyk). Zbudowana z <b>Warstwy Wejściowej</b>, ukrytego <b>'Czarnego pudełka' wielu gęstych warstw wag</b> i <b>Wyjścia</b>.<br>Sygnał X płynie twardo tylko od lewej do prawej; całkowity brak jakichkolwiek sprzężeń zwrotnych i całkowity brak elementu podtrzymującego przeszłą pamięć.",
+                testOptions: {
+                    easy: [
+                        { text: "Sygnał biegnie jak po sznurku od wejścia do wyjścia – wprost w jedną stronę, bez możliwości cofania się i zapętlania.", isCorrect: true },
+                        { text: "Taka sieć kręci się w miejscu do czasu, aż zawiesi się procesor komputera w niekończącej się pętli.", isCorrect: false },
+                        { text: "Sygnał idzie z prawej strony ekranu, na dół pod klawiaturę, a wypluwa kartkę z drukarki.", isCorrect: false },
+                        { text: "To sieć bez żadnych warstw ukrytych, jest po prostu jednym wielkim przezroczystym oknem dla plików tekstowych.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Zbudowana z wejść, warstw ukrytych oraz wyjścia. Sygnał podróżuje zawsze od lewej do prawej, bez żadnych nawrotów czasowych (pętli).", isCorrect: true },
+                        { text: "Posiada ukrytą pętlę sprzężenia, ale dla algorytmu i tak liczy się wyłącznie ostateczny rzut z wyjścia wstecz.", isCorrect: false },
+                        { text: "Charakteryzuje się brakiem wag synaptycznych, przez co jest najwolniejszą, ale najpewniejszą, jednokierunkową architekturą.", isCorrect: false },
+                        { text: "Pobiera dane naraz z wszystkich warstw, co pozwala jej osiągnąć stan zapominania klasycznych błędów z wejścia.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Składa się z warstwy wejścia, warstw ukrytych i wyjścia; sygnał w każdej sytuacji podróżuje nieuchronnie tylko w jeden punkt z lewa na prawo bez istnienia pętli zwrotnych.", isCorrect: true },
+                        { text: "Struktura warstwowa z luźnym przepływem we wszystkich kierunkach trójwymiarowych naraz, gdzie najdalsza warstwa wysyła wstecz wektory atencji.", isCorrect: false },
+                        { text: "Jest to prymitywna architektura sprowadzona tylko z samej bramki liniowej, opierająca się o wybiórcze mapowanie wejść z całkowitym ucięciem 'warstw czarnych'.", isCorrect: false },
+                        { text: "Sieć ta stale modyfikuje same swoje kształty geometryczne topologii przez przepływ pętli do wejścia na nowym zbiorze testowym bez backpropagacji.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "14. Przedstaw i wyjaśnij konstrukcję sieci rekurencyjnych (RNN).",
+                flashcardAnswer: "Architektura do sekwencji (jak mowa i tekst). Posiada mechanizm <b>Sprzężenia Zwrotnego i Pamięci (H)</b>. W ukrytej warstwie wyjście z kroku czasu t-1 zawraca i spotyka się w wejściu z nowym bodźcem z czasu t. Przez to sieć potrafi przetwarzać słowa w kontekście tego co 'widziała' przed chwilą. Jej wadą jest zanikający długoterminowy gradient.",
+                testOptions: {
+                    easy: [
+                        { text: "Sieci te w odróżnieniu od klasycznych posiadają pętle, dzięki którym potrafią 'pamiętać' co zdarzyło się chwilę wcześniej w danym zdaniu tekstu.", isCorrect: true },
+                        { text: "Są to sieci stworzone wyłącznie dla maszyn budowlanych w celu przewidywania twardości betonu i wycieków koparki w rurociągu.", isCorrect: false },
+                        { text: "Używają one całkowicie skokowej funkcji matematycznej, żeby sieć nie miała pamięci i skupiła się tylko na najnowszym problemie.", isCorrect: false },
+                        { text: "Należą do starych sieci mechanicznych z napędem diesla, co powoduje dużo dymu i szumu z błędem w pętli dysku głównego.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Posiadają sprzężenia zwrotne (stan ukryty), przez co wyjście z poprzedniego kroku wraca na wejście, nadając sieci formę krótkiej pamięci ciągów.", isCorrect: true },
+                        { text: "Zbudowane są z bramki wyjściowej, a ich głównym atutem jest brak zanikającego gradientu przy przetwarzaniu długich tekstów z wielu słów.", isCorrect: false },
+                        { text: "Są jednokierunkowe, jednak co epokę tworzą sprzężenia wstecznej propagacji biologicznej usuwając najstarsze dane wejściowe.", isCorrect: false },
+                        { text: "To inna nazwa algorytmu perceptronu bez nauczyciela, który rekurencyjnie powtarza operacje dopóki nie zostanie zatrzymany Early Stoppingiem.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Posiada pętle i sprzężenia zwrotne, co umożliwia ciągłe utrzymywanie 'stanu ukrytego' pamięci na podstawie poprzednich kroków, wysoce preferowanych w tekstach.", isCorrect: true },
+                        { text: "Strukturalny przepływ w bloku jest zupełnie w 100% jednokierunkowy jak dla MLP, a pamięć operuje poza warstwami bazując wprost na wektorach nagród.", isCorrect: false },
+                        { text: "Budowana na transformatorach n-wymiarowych o odgórnym braku sprzężeń w czasie i bazuje wyłącznie tylko na sztywnym mechanizmie gęstej atencji.", isCorrect: false },
+                        { text: "Tworzy połączenia sprzężeniowe krzyżowe tylko na granicy dwóch punktów wejścia i punktu wyjścia, bez docierania do gęstych warstw logarytmów wewnętrznych.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "15. Wyjaśnij ideę optymalizacji gradientowej w uczeniu warstwowych sztucznych sieci neuronowych.",
+                flashcardAnswer: "To poszukiwanie dna 'doliny błędu' (minimum funkcji straty). Algorytm liczy pochodne, odwraca rygorystycznie wektor najszybszego spadku i robi kroczek (eta) z pochyłości w dół. Kiedy osiąga dno (gradient ~0) - kończymy poprawki.",
+                testOptions: {
+                    easy: [
+                        { text: "Wyobraź to sobie jako schodzenie w ciemnościach najkrótszą drogą na samo dno kanionu, by znaleźć upragniony zerowy punkt błędu uczącej się maszyny.", isCorrect: true },
+                        { text: "To szukanie jak najpiękniejszych kolorów z tęczy i wypełnianie nimi obrazków tak by program lepiej je zapamiętał do druku.", isCorrect: false },
+                        { text: "Zasada dbania o to by kable w serwerowni układały się optymalnie by unikać pożaru sieci i zwarcia uziemienia gradientu.", isCorrect: false },
+                        { text: "Zabawa w chowanego, gdzie komputer chowa się przed błędami i wyskakuje kiedy wejście pokazuje 100%.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Polega na obliczeniu pochodnych cząstkowych i przesuwaniu wartości wag o mały krok w kierunku spadku do minimum błędu.", isCorrect: true },
+                        { text: "Metoda ta wybiera całkowicie losowo wagi z matrycy do czasu aż sieć przypadkowo wpadnie do doliny najmniejszych kosztów testowych.", isCorrect: false },
+                        { text: "Polega na obcinaniu warstw sieci o połowę, aż zmniejszy się jej apetyt na moc matematyczną, dzięki czemu funkcja osiąga stabilność.", isCorrect: false },
+                        { text: "To technika stosowana wyłącznie w propagacji do przodu, wymuszająca by suma wejść uderzała dokładnie w próg funkcji aktywacji.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "To fundamentalna technika minimalizacji wyliczonego błędu, polegająca w skrócie na obliczaniu kierunku pochodnych i wędrowaniu kroczkami stromości w dół funkcji do dna.", isCorrect: true },
+                        { text: "Ciągły proces powiększania szczytu straty za pomocą macierzy by drastycznie wymuszać poszukiwanie skomplikowanych pętli i odnóg decyzyjnych węzłów logarytmu.", isCorrect: false },
+                        { text: "Jest to taktyka wybierania sztywnych parametrów całkowicie w sposób stochastyczny bez stosowania ciągłych matematycznych wektorów dla uniknięcia dolin lokalnych.", isCorrect: false },
+                        { text: "Algorytm opierający spłaszczenie wielowarstwowych potoków sieci do struktury płytkiej o jednym bloku tylko i wyłącznie w imię silnego zoptymalizowania epok dla nauki.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "16. Wymień i wyjaśnij zalety i wady optymalizacji gradientowej.",
+                flashcardAnswer: "<b>Zalety:</b> Gwarancja ciągłego kierowania ku naprawie błędu i uniwersalność dla prawie każdego problemu. Podstawa DL.<br><b>Wady:</b> Potrafi utknąć w płaskich dołkach (minimach lokalnych), bywa wrażliwa na zły dobór kroku uczenia oraz cierpi na drastyczne eksplozje i wyciszenia przy przenoszeniu przez głębokie warstwy (Vanishing Gradient).",
+                testOptions: {
+                    easy: [
+                        { text: "Zaletą jest to, że potrafi powoli i skutecznie leczyć matematycznie sieć; wadą jest często utykanie na płaskowyżu w poszukiwaniu dobrego wyniku.", isCorrect: true },
+                        { text: "Jedyną zaletą jest darmowa paczka z danymi od sponsora, a błędem jest że często model wypluwa prąd w twarz programisty w trakcie usterki.", isCorrect: false },
+                        { text: "Ma same wady m.in bardzo długo parzy się wodę do herbaty zasilającej główny układ i łatwo o zgubienie plików w koszu z Windowsa.", isCorrect: false },
+                        { text: "Olbrzymią zaletą jest to że buduje nam 3 domy i gotuje, a maleńką wadą że gradient nie potrafi wypowiadać trudnych polskich zdań.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Zalety to gwarantowany marsz funkcji do zera, a wady to groźne minima lokalne oraz problemy z zanikającym gradientem na głębokich warstwach.", isCorrect: true },
+                        { text: "Optymalizacja uodparnia sieć w pełni na zanik wiedzy, ale niestety gubi często pętle sprzężeń z warstw bramek wejściowych wektorów.", isCorrect: false },
+                        { text: "Zaletą jest bardzo prosta płaska sieć bez użycia aktywacji, zaś wadą to wymóg posiadania bardzo małego tempa uczenia (η) w pętli Hebba.", isCorrect: false },
+                        { text: "Niweluje na stałe zjawisko overfittingu u wejścia, lecz jej minusem jest zamarzanie pochodnych w metodzie bez jakiegokolwiek nauczyciela.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Zaletami metody są matematyczna gwarancja sprawności w ciągłości, a bardzo trudnymi wadami są np. zamarzanie w dolinach lokalnych oraz zaniki wektorów na pierwszych warstwach.", isCorrect: true },
+                        { text: "Fundamentalną zaletą spłaszczeń jest usunięcie potrzeb na straty i ciągłych pochodnych na siłę; problematyczna wada ogranicza jednak metodę przy wgrywaniu macierzy.", isCorrect: false },
+                        { text: "Potężna zaleta dająca gwarancję szybkiego znalezienia minimum globalnego w 100% testów; wada krytyczna zmusza analityka do stosowania jedynie spłaszczonych funkcji skokowych z zerowymi parametrami.", isCorrect: false },
+                        { text: "Zaletą nie do powtórzenia stanowi całkowita powłoka przed urojeniem uczenia (overfit); wada zakotwicza użyteczność optymalizacji do małych sieci z gęstością maksymalnie na wagi równe 1.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "17. Wyjaśnij istotę algorytmu wstecznej propagacji błędu w uczeniu sieci warstwowych.",
+                flashcardAnswer: "<b>Backpropagation (Wsteczna Propagacja):</b> Święty Graal DL. Oblicza z wyjścia kto i jak na łańcuszku jest winny dużej pomyłce na koncu. Wykorzystuje do tego Zasadę Łańcuchową (Chain Rule) pochodnych i od wyjścia, krok po kroku w lewo, zrzuca i aplikuje malutkie zrzucone zmiany na odpowiednie wagi winowajców.",
+                testOptions: {
+                    easy: [
+                        { text: "Służy do odszukiwania winnych błędnych wag w sieciach; idzie z końca błędu do samego początku układu pilnując sprawiedliwego rozdania poprawek w klasie.", isCorrect: true },
+                        { text: "Wsteczna propagacja oznacza uczenie robota chodzić tyłem, na rękach aż dojdzie z mety na linię startu używając kamer.", isCorrect: false },
+                        { text: "Jest to funkcja kasowania całej złej pracy do kosza jednym guzikiem 'Ctrl+Z' z propagacją prądu na dół z powrotem.", isCorrect: false },
+                        { text: "Zmusza programistę do cofnięcia się w karierze z racji złych ocen za kodowanie algorytmów z 100 błędem do poprawy.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Wylicza pochodną błędu z wyjścia sieci i cofa sygnał używając reguły łańcuchowej (chain rule), odpowiednio przypisując i aktualizując każdą winną wagę w kierunku wejścia.", isCorrect: true },
+                        { text: "Pozwala na znalezienie szumu na wejściu sieci i przesyła go do wyjścia pomijając całkowicie powiązania w głębokich gęstych obwodach sumatora.", isCorrect: false },
+                        { text: "Polega na zresetowaniu wag do wartości zera i zbudowaniu nowych pętli od środka modelu na zewnątrz by zneutralizować straty w binarnej warstwie.", isCorrect: false },
+                        { text: "To nienadzorowana technika, która na wyjściu ocenia sygnał, odcina ujemne wyniki ReLU i tworzy nowe komórki bramkowe na krawędzi sygnału testowego.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Oblicza winę za błędne wyjścia układu i propaguje pomyłkę wstecz za pomocą łańcuchowej reguły pochodnych, rozdzielając udziały poprawek między wagami licznych pięter warstw ukrytych.", isCorrect: true },
+                        { text: "Procedura czyszczenia danych testowych od zera, skanująca szkodliwe błędy logiczne i usuwająca artefakty, tak żeby uchronić bloki przed groźnymi awariami na złączach pamięci cache.", isCorrect: false },
+                        { text: "Jest wirtuozyjną sprytną strategią w procesie całkowicie beznadzorowym, służącą jedynie przebudowaniu architektury z wejścia by odbudowała sygnał dla nowej serii ogólnych klastrów.", isCorrect: false },
+                        { text: "Podejście do gwałtownego zwężania węzłów przez po prostu ordynarne ucinanie warstw wewnętrznych sieci do pojedynczego pułapu od wyjścia po wejście z pominięciem wag skokowych.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "18. Zapisz w punktach etapy algorytmu wstecznej propagacji błędu.",
+                flashcardAnswer: "1. Faza w przód (Forward pass) – przepuszczenie danych do y.<br>2. Pomiar całkowitego błędu/kosztu względem pożądanego d.<br>3. Faza w tył (Backward pass) – policzenie części winy (gradientu) idąc od prawego wylotu do lewej krawędzi.<br>4. Uaktualnienie fizyczne parametrów sieci za pomocą ustalonego kroku ety, i przejście do kroku 1.",
+                testOptions: {
+                    easy: [
+                        { text: "Krótko: 1. Lot na koniec (w przód). 2. Obliczenie kary błędu. 3. Podział i rozesłanie winy (wstecz). 4. Poprawa winnych wag od zera dla epoki nr 2.", isCorrect: true },
+                        { text: "1. Zjedzenie śniadania z wejścia prądu. 2. Pielęgnacja kabelka wstecz. 3. Sprzątanie obwodu wodą i powrót na ekran wyjścia do zera w logarytmach.", isCorrect: false },
+                        { text: "W skrócie: 1. Szum. 2. Zamrożenie. 3. Błąd na wyjściu systemu w koszu. 4. Płacz programisty bo komputer nie reaguje na guziki.", isCorrect: false },
+                        { text: "Kroki to: 1. Wejście wstecz z prawej, by potem wyjść w dół. 2. Wykasowanie połowy warstw. 3. Losowanie wyniku z pliku testowego od zera.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "1. Przepływ w przód dla próbki. 2. Pomiar różnicy z oczekiwaniem. 3. Obliczenie gradientu wstecz metodą łańcuchową. 4. Skorygowanie wag i nowy cykl od lewej osi.", isCorrect: true },
+                        { text: "1. Wyliczenie błędu na przodzie od razu bez przepuszczania po wagach. 2. Optymalizacja węzła bez pochodnych 3. Podanie wyniku czystego. 4. Wyłączenie pętli obwodu w epoce na wprost.", isCorrect: false },
+                        { text: "1. Sprzężenie z zasilaczem i Hebbem 2. Podanie stanu testów. 3. Obliczenie odległości na krawędzi bramki w epoce. 4. Usunięcie szumów przy wejściu dla bezpieczeństwa sieci.", isCorrect: false },
+                        { text: "1. Ustalenie parametrów zerowych. 2. Zrobienie cyklu w przód testowo. 3. Rezygnacja z propagacji na lewo na korzyść w dół ujemnego kroku ety z błędu na wyjściu ujemnym dla straty urojonej.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "1. Przepływ i obróbka do przodu. 2. Pomiar błędu na wynikach. 3. Backpass z wyliczeniem gradientów w lewo krok po kroku 4. Aktualizacja ostateczna na wagach od zera i nowy rzut epoki.", isCorrect: true },
+                        { text: "1. Inicjowanie nowych wag przed podaniem. 2. Redukcja połowy dendrytów bloku. 3. Weryfikacja bez pochodnych błędu. 4. Pętla powrotna epoki całkowicie bez wektorowych obciążeń w warstwach", isCorrect: false },
+                        { text: "1. Powstanie ukrytej wstecznie sprzężonej pętli RNN. 2. Wysłanie wejść do stref wektorów x(t). 3. Ciągły update pamięci sieciowej. 4. Przekierowanie wsteczne dla zbiorów ze zwarciem sprzężenia na zero.", isCorrect: false },
+                        { text: "1. Zastosowanie funkcji skokowej Heaviside'a do błędu 2. Propagacja przez wspólną złączkę 3. Rejestracja wektora wypadkowego błędu u wyjścia w dół eta. 4. Usunięcie długoterminowych stanów od dołu.", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "19. Wyjaśnij istotę działania i konstrukcję sieci LSTM.",
+                flashcardAnswer: "Lekarstwo na słabą długoterminową pamięć RNN. Zawiera 'magistralę pamięci' (Cell State), w której sygnał biegnie bez barier matematycznych zaniku.<br>Zarządza wektorami w rurze używając trzech sprytnych bramek sterujących: <b>Bramki zapominania</b> (wyrzuca co zbędne), <b>Bramki wejściowej</b> (dokłada nowości z czasu obecnego) i <b>Bramki wyjściowej</b>.",
+                testOptions: {
+                    easy: [
+                        { text: "Sieci o super-pamięci, stworzone tak że posiadają zawory potrafiące decydować mądrze co zachować dla tekstu na dłużej (np. na stornie nr 10) a co mądrze odrzucić do zapomnienia.", isCorrect: true },
+                        { text: "Prymitywne maszyny wykorzystywane na statkach towarowych z żelazną długą magistralą, by nie zatopić paczek pamięciowych logistyki.", isCorrect: false },
+                        { text: "Oznacza model posiadający bardzo wielkie problemy z zacinaniem w kółko przy prostych słowach pętli RNN o czym nie należy w testach ogóle zapominać nigdy.", isCorrect: false },
+                        { text: "To sieć bez sztywnych kabli i bramek do usuwania i kasowania wejść do bazy przez co zapamiętuje zbiory śmieciowe i na końcu psuje plik Excel w komputerze.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Budowana wokół stałego stanu komórki w czasie by chronić gradient przed zapadnięciem w pętli. Zawiera m.in inteligentną bramkę zapominania wyrzucającą to co przestało mieć głęboki sens na pętli w czasie sekwencji.", isCorrect: true },
+                        { text: "To model RNN skompresowany o połowę bramek by w wektorowym czasie odciążyć szybkość; brak pętli dla ułatwienia sprzężenia od pierwszej do ostatniej warstwy w zdaniu.", isCorrect: false },
+                        { text: "Konstrukcja nie używa pochodnych z wejściami, bo opiera wszystkie swoje siły o bramki Heaviside'a pod kątem komórek liniowych ucinających 0 z błędem z propagacji.", isCorrect: false },
+                        { text: "Skupia się na zapominaniu gradientów z pętlą dla uniknięcia uczenia pamięciowego dla sieci w przód. LSTM chroni więc wyłączenie warstw na siłę za pomocą tzw. zaworów bramek dropout.", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Model powołany pod ratunek na znikanie pamięci o dalekich znakach, zbudowany o tzw. główny pas stanu komórki obsługiwany rygorystycznie zaworami bramek: zapominania, wlotu oraz ujścia ostatecznego wynikiem.", isCorrect: true },
+                        { text: "Płaska jednokierunkowa taśma na wzorcu bez najmniejszych pętli ze stałymi czasami w osi, budowana używając zawiłych rur wyłącznie w początkach najprostszych pierwszych gęstych warstw nieliniowej logiki.", isCorrect: false },
+                        { text: "Sztandarowa klasyka starego typu stworzona jedynie przez wielką bramkę zapominania w rurze RNN czyszcząca na stałe wyrzucaną na bieżąco wzmocnioną krótką pamięć u wyjścia w epokach bez zachowania stanów.", isCorrect: false },
+                        { text: "Silnie przerobiony kręgosłup splotowy z rurą węzłów komórek ukrytych stanów wejściowych pikselowych z obrazów, powszechnie stosowana dla zapobiegania wybuchom w pętlach o czasie bliskim dla klatkom wideo", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "20. Wyjaśnij co oznacza potoczne określenie mówiące, że sieć „uczy się na pamięć”. W jaki sposób można nie dopuścić do zjawiska?",
+                flashcardAnswer: "<b>Uczenie na pamięć (Overfitting / Przeuczenie):</b> Wstydliwe ułożenie granic bez reszty dla szumu zestawu testowego z pominięciem głębokiego ukrytego schematu i braku logiki z uogólnianiem na nowe zbiory (niski błąd testu przy fatalnym zbiorze walidacji).<br><b>Zapobieganie:</b><br>- Early Stopping (natychmiastowe cięcie przy wzroście walidacyjnym)<br>- Dropout (zabijanie części węzłów by wymusić zaufanie u innych i zbić spiskowców w cieniu)<br>- Cięcie architektury na fizycznie mniejszą.",
+                testOptions: {
+                    easy: [
+                        { text: "Sieć recytuje dane z treningu tak dobrze że aż wkuła błędy w tle, lecz przy nowych plikach pada jak mucha z braku inteligencji. Zabezpiecza się przed tym rzezując węzły warstw (zjawisko zrzucania Dropout).", isCorrect: true },
+                        { text: "Oznacza, że komputer ma wpięte zbyt dużo kości w płytę i maile do ułożenia danych co grozi awarią; powinno się wyciągnąć 2 kable by go uratować we wtykach RAMu fizycznego bez przerwy na dropouty bramek.", isCorrect: false },
+                        { text: "Sieć jest tak wspaniała i uczy się z kartką w reku tak idealnie że w 100% ogarnia wszystkie zbiory ze wszechświata w modelu logicznym, powstrzymujemy ją bo zajmuje całą planetę prądem przy podanych na czas epokach", isCorrect: false },
+                        { text: "Pamięć oznacza wielki powrót maszyny Turinga u bram klasycznych problemów ze XOR z wbudowaną karą. Pozbywamy się używając małego tempa η u perceptronu przed wjazdem propagacji pętli bramek na ekranu testu by ratować wagi.", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Przeuczenie to zjawisko, gdzie błąd na teście jest idealny i wynosi 0, podczas gdy model sypie się na danych nowych. Przeciwdziała się temu techniką obcinania epok (Early Stopping) albo wyciszaniem neuronów warstw przez Dropout.", isCorrect: true },
+                        { text: "Sieć za wcześnie ucieka w minimalne dołki lokalne by oszczędzić stan z czasem przed obcięciem z powodu za silnych wejść. By temu ulec należy mocno pomnożyć na stałe tempo kroków η dla wejść bez używania bazy walidacji dla bramek rur czasu testu", isCorrect: false },
+                        { text: "Przeuczenie oznacza wielki stan w którym w pętli na wylot wyrzuca ujemne tangensy z wektorami w nieskończoność przez potężną głęboką rurę; radzimy z nim przez wymuszanie rzutowania przez zawiłe węzły bramek wpuszczających u wylotu i rzucaniem zer za pętle w przód", isCorrect: false },
+                        { text: "Jest to stan w którym dla pętli rekursywnej w modelach stochastycznych waga eksploduje do plus 1 bez żadnej tolerancji błędu wyjścia co skutkuje spadkiem wag dla całego bloku logistycznej rury z pętli testów z błędami wyłączeń przez Heaviside z odrzutu", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Zjawisko 'overfittingu' z objawem utraty sensu generalizacji dla danych we wszystkich obcych pozycjach na rzecz perfekcji szumu bazy nauki; gaszone na dropoutach, early zatrzymywaniu i kurczeniu ilości złącz wagowych na rzecz mniejszych zasobów węzłów", isCorrect: true },
+                        { text: "Moment katastrofy uczenia po zbyt silnej redukcji małego wsp. uderzającego eta i sieć opiera swój cały proces wprost na zerowej pamięci RAM nie generalizując cech. Działa po wyśrubowaniu 1000% iteracyjnie w osi testów walidacji epoki", isCorrect: false },
+                        { text: "Synonim perfekcyjnej generalizacji wyższego stopnia dla klas walidacji; zjawiska się nie blokuje z braku powództwa w sensie logiki z wagi, gdyż podniesienie szumu oznacza o wyśmienitym działaniu pętli w czasie wektorowych operacji na wagach rur bazy", isCorrect: false },
+                        { text: "Rozpoczęcie groźnego zatrucia plikiem szkodników dla bazy uczącej przy stykach zasady Hebbia z rur; bronią przed brakiem pamięci w tym wariancie testów jest dobudowywanie bramek z pamięcią przez wkład wielkich bloków z wektorowej pętli sieciowych węzłów z epoki przed wyrzutami", isCorrect: false }
+                    ]
+                }
+            },
+            {
+                question: "21. Wymień i wyjaśnij podstawowe zalety i wady stosowania sztucznych sieci neuronowych w badaniach ekonomiczno - społecznych.",
+                flashcardAnswer: "<b>Główne Zalety:</b> Fenomenalnie elastyczne, odporne na luki i trudny brud w zbiorze ankiet. Wyłapują zjawiska poza rygorem statystyki bez krzywych normalnych.<br><b>Główne Wady:</b> Zmora 'Black Box' (zapadnięta czarna skrzynka wagi - maszyna orzeknie wyrok by nie dać ci kredytu u prezesa banku w sposób magicznie poprawny, ale żaden informatyk <i>nie wyciągnie z logarytmów przyczynowo-skutkowego powodu 'DLACZEGO' do papierów i zgód do wyroku.)</i> Cierpią często także na wielką chciwość ogromnej masy darmowych wejściowych plików z błędami szumu do napędu by osiągnąć poprawność u wektora i rurociągów z dropoutami.",
+                testOptions: {
+                    easy: [
+                        { text: "Fenomenalnie wczuwają się i dopasowują we wzory i anomalia w ludziach których nauka w logice prostej statystyki z trudem by się wyrzekła, ale wadą groźną jest mroczny zjawiskowy 'Black Box', nikt w nich nie wie na 100% 'dlaczego' tak na koniec oceniły by wydać komuś wielki wyrok u bram dla odrzucenia za sprawą setek wag z wnętrza do spraw.", isCorrect: true },
+                        { text: "Mocą i siłą sieci dla ludzi okazał się tani i świetny dostęp do procesorów na prąd stały bez płacenia zysku na wejściach i na giełdach bez błędów w czasie testów i dropoutów, minusem jest z pewnością okropna sztywność w odczytywaniu dla wykresów liniowych i brak prądu stałego u wylotu na rurach komputera na bazie u wektorów", isCorrect: false },
+                        { text: "Ich genialną w stu procentach udaną zaletą wydaje się być absolutna przezroczystość działania u bram logiki i brak uchybień dla zrzutu logarytmów na test. Bardzo gigantycznym problemem na rynkach banków o wyjścia kredytu dla obrotów u wyjścia węzłów wag okazała się za to wysoka usterkowość pod wpływem braku pamięci", isCorrect: false },
+                        { text: "Są tak dobre że same potrafią bez jakiejkolwiek ludzkiej wprawy we wektorach wyprodukować nowe surowce naturalne z plastiku dzięki rurze pętli co wzbudziło ogromną na wektorach i giełdach euforię; kłopotem jest pętla u węzłów która wymusza budowanie wielkiej ilości chmur o ujęciach z wybuchem z zewnątrz dla RNN bez strat i ukryć warstwy testowej ", isCorrect: false }
+                    ],
+                    medium: [
+                        { text: "Zaletą nie do przecenienia jest doskonała praca z niespójnymi brudnymi próbkami danych od ludzi w czasie wywiadu by rzucać wektorem w pętli od razu u wyjść bez założeń z Gaussa, a straszliwą skazą w praktyce jest całkowita niemożliwość po testach udokumentowania sztywnych przyczynowo-skutkowych dla praw prawnych w RODO o werdykcie za zaufania dla ukryć", isCorrect: true },
+                        { text: "Jedyną korzyścią na wyciągniecie na rynku wydaje się czysta jawność macierzy błędu decydującej u dołu logiki psychologii klienta by wyciągnąć od zaraz proste zasady węzła po dropoutach; po drugiej mrocznej części wad groźnym powodem jest dla testu blokada u ciągłej rury wektora LSTM co wymusza w modelu rygor do klastrów statystyki liniowej na krawędzi wejścia za wylotem do warstw gęstych bez echa do zera ", isCorrect: false },
+                        { text: "Cudowna własność by działały idealnie polega na ujęciach u rur wektorów dla zaledwie skrajnie i fizycznie ułamkowej liczby testowych ludzi na wyjścia by pokazać w modelu i uogólnić w pętli świat u stochastycznych wag bez epoki po starcie w pliku na zewnątrz by odbudować spadek; ciemną plamą w statystyce pozostaje zanik dla bramek wewnątrz głębokiego sprzęgnięcia pętli z wyjścia", isCorrect: false },
+                        { text: "Ich z pewnością najlepszą stroną bez wad ujęto powstrzymywanie z sztywnych pętli błędów z wektorem od wylotu by nie zgubić danych przed obcięciem z ujęcia ludzi i bramek w społeczeństwie na wektor rygoru w pliku dropout; największym na rynkach problemem obrośnięto za to wymuszanie za czas rygorystycznie sztywnego prawa krawędzi wejść od liniowej spłaszczonej straty dla ukrycia by zadowolić pętle w warstwie", isCorrect: false }
+                    ],
+                    hard: [
+                        { text: "Posiadają ogromny dar wychwycenia ukrytych złożonych wzorców społecznych w wyższych wymiarach od sztywnych statystyk pomijając założenia w układzie normy. Największą plamą w ich wadach jest wprost absolutny brak głębokiej interpretacji motywów dla konkretnych przypadków - czarna skrzynka i powód do prawnych uchybień z logarytmów przy pętli", isCorrect: true },
+                        { text: "Jedyną korzyścią okazuje się tu nienaganna 100% zaufana i dogłębna widzialność każdej macierzy decydującej u dołu logiki psychologii jednostki, po drugiej stronie groźnym obciążeniem bywa brak działania w wektorowych złączach liczb dających ciągłą gęstość i blokujących sygnał klastru na warstwach splotów rur od wyjścia do zera w straty.", isCorrect: false },
+                        { text: "Cudowna własność i zaledwie parę sztuk rekordów wiersza z osi potrzebnych dla zaspokojenia potężnych potrzeb dla bardzo wiarygodnego wyższego modelu klasyfikacji wielopoziomowej; wielka ciemna strona to jednak spory kłopot gradientowych braków dla bardzo obszernych tekstów dla ankiet badanych w psychologii by ocenić w wylocie węzłów do pętli do przodu u testów", isCorrect: false },
+                        { text: "Ich pozycję bardzo uszanowano pod silnie pewny i obronny dla matematyki rygorystyczny charakter ciągu dla powiązań z przyczynami z praw dla ludzi u klastrów wejścia na lewo; minusem nie do ominięcia powstrzymującym giełdy i socjologów z rewolucji na wektorach i rurach wejścia okazuje się z zasady brak ujęcia pętli dla rur ukrytych w wejściowych warstwach bramek w pętli.", isCorrect: false }
+                    ]
+                }
+            }
+        ];
+
+        // ==========================================
+        // LOGIKA WIDOKU I STEROWANIE
+        // ==========================================
+        let currentMode = 'flashcards'; // 'flashcards' | 'test'
+        let currentDifficulty = 'easy'; // 'easy' | 'medium' | 'hard'
+        
+        function setMode(mode) {
+            currentMode = mode;
+            if (mode === 'flashcards') {
+                document.getElementById('tab-flashcards').classList.add('active');
+                document.getElementById('tab-test').classList.remove('active');
+                document.getElementById('flashcard-view').classList.remove('hidden');
+                document.getElementById('test-view').classList.add('hidden');
+            } else {
+                document.getElementById('tab-test').classList.add('active');
+                document.getElementById('tab-flashcards').classList.remove('active');
+                document.getElementById('test-view').classList.remove('hidden');
+                document.getElementById('flashcard-view').classList.add('hidden');
+                initTest();
+            }
+        }
+
+        function setDifficulty(diff) {
+            // Zmiana przycisków
+            document.querySelectorAll('.diff-btn').forEach(btn => btn.classList.remove('active'));
+            if(diff === 'easy') document.getElementById('btn-diff-easy').classList.add('active');
+            if(diff === 'medium') document.getElementById('btn-diff-med').classList.add('active');
+            if(diff === 'hard') document.getElementById('btn-diff-hard').classList.add('active');
+            
+            currentDifficulty = diff;
+            initTest(); // Reset testu z nowym poziomem by uniknąć glitchowania wyniku
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // ==========================================
+        // LOGIKA FISZEK
+        // ==========================================
+        let quizData = [...rawQuizData];
+        let currentFlashcardIndex = 0;
+        let isFlipped = false;
+
+        const flashcard = document.getElementById('flashcard');
+        const cardFront = document.getElementById('card-front');
+        const cardBack = document.getElementById('card-back');
+        const counter = document.getElementById('counter');
+
+        function loadCard() {
+            if(quizData.length === 0) return;
+            cardFront.innerHTML = quizData[currentFlashcardIndex].question;
+            cardBack.innerHTML = quizData[currentFlashcardIndex].flashcardAnswer;
+            counter.innerText = `${currentFlashcardIndex + 1} / ${quizData.length}`;
+            
+            if (isFlipped) {
+                flashcard.classList.remove('is-flipped');
+                isFlipped = false;
+            }
+            setTimeout(() => { cardFront.scrollTop = 0; cardBack.scrollTop = 0; }, 300);
+        }
+
+        function flipCard() { flashcard.classList.toggle('is-flipped'); isFlipped = !isFlipped; }
+
+        function nextCard() {
+            if (currentFlashcardIndex < quizData.length - 1) currentFlashcardIndex++;
+            else currentFlashcardIndex = 0;
+            if (isFlipped) { flipCard(); setTimeout(loadCard, 300); } else { loadCard(); }
+        }
+
+        function prevCard() {
+            if (currentFlashcardIndex > 0) currentFlashcardIndex--;
+            else currentFlashcardIndex = quizData.length - 1;
+            if (isFlipped) { flipCard(); setTimeout(loadCard, 300); } else { loadCard(); }
+        }
+
+        function shuffleDeck() { shuffleArray(quizData); currentFlashcardIndex = 0; loadCard(); }
+        function resetDeck() { quizData = [...rawQuizData]; currentFlashcardIndex = 0; loadCard(); }
+
+        // ==========================================
+        // LOGIKA TESTU
+        // ==========================================
+        let testOrder = [];
+        let currentTestIndex = 0;
+        let isAnswered = false;
+
+        const imgSuccess = "https://cdn.discordapp.com/attachments/1425129780612698275/1450998109227454504/s8fBnCP.png?ex=6a26ac0b&is=6a255a8b&hm=927ee2f481d75307644a43716060c1ee5d74a6cd7077c120828f33dfc7c402e9&";
+        const imgFail = "https://cdn.discordapp.com/attachments/1425129780612698275/1491851547443986452/d5m10ns.png?ex=6a265246&is=6a2500c6&hm=42c6f99911faf9102cf649e78f2f497af2ac2152d028fd13103b9193ba6a5880&";
+
+        function initTest() {
+            testOrder = rawQuizData.map((_, index) => index);
+            shuffleArray(testOrder);
+            currentTestIndex = 0;
+            loadTestQuestion();
+        }
+
+        function loadTestQuestion() {
+            if(testOrder.length === 0) return;
+            isAnswered = false;
+            document.getElementById('btn-next-test').style.display = 'none';
+
+            const itemIndex = testOrder[currentTestIndex];
+            const currentItem = rawQuizData[itemIndex];
+
+            document.getElementById('test-question').innerHTML = currentItem.question;
+            document.getElementById('test-counter').innerText = `${currentTestIndex + 1} / ${testOrder.length}`;
+
+            // Pobieramy odpowiedzi z odpowiedniego dla aktualnie wybranego poziomu trudności
+            let options = [...currentItem.testOptions[currentDifficulty]];
+            shuffleArray(options); // Tasujemy 4 warianty
+
+            const optionsContainer = document.getElementById('test-options');
+            optionsContainer.innerHTML = '';
+
+            const labels = ["A. ", "B. ", "C. ", "D. "];
+            options.forEach((opt, idx) => {
+                const optDiv = document.createElement('div');
+                optDiv.className = 'option-btn';
+                optDiv.innerHTML = `<strong>${labels[idx]}</strong> &nbsp; ${opt.text}`;
+                optDiv.isCorrectAnswer = opt.isCorrect;
+                optDiv.onclick = () => selectTestAnswer(optDiv);
+                optionsContainer.appendChild(optDiv);
+            });
+        }
+
+        function selectTestAnswer(selectedElement) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const allOptions = document.querySelectorAll('.option-btn');
+            allOptions.forEach(opt => {
+                opt.classList.add('disabled');
+                if (opt.isCorrectAnswer) opt.classList.add('correct');
+            });
+
+            if (!selectedElement.isCorrectAnswer) {
+                selectedElement.classList.add('wrong');
+                showModal(false);
+            } else {
+                showModal(true);
+            }
+
+            document.getElementById('btn-next-test').style.display = 'block';
+        }
+
+        function nextTestQuestion() {
+            if (currentTestIndex < testOrder.length - 1) {
+                currentTestIndex++;
+                loadTestQuestion();
+            } else {
+                alert("Koniec pytań testowych! Tasowanie od nowa.");
+                initTest();
+            }
+        }
+
+        // ==========================================
+        // OBSŁUGA MODALA I KLAWIATURY
+        // ==========================================
+        function showModal(isSuccess) {
+            const modal = document.getElementById('result-modal');
+            const img = document.getElementById('result-img');
+            img.src = isSuccess ? imgSuccess : imgFail;
+            modal.classList.add('active');
+        }
+
+        function closeModal() { document.getElementById('result-modal').classList.remove('active'); }
+
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('result-modal');
+            if(modal.classList.contains('active')) {
+                if (e.code === 'Space' || e.code === 'Enter' || e.code === 'Escape') {
+                    e.preventDefault(); closeModal(); return;
+                }
+            }
+            if (currentMode === 'flashcards') {
+                if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+                else if (e.code === 'ArrowRight') { nextCard(); }
+                else if (e.code === 'ArrowLeft') { prevCard(); }
+            } else if (currentMode === 'test') {
+                if (e.code === 'ArrowRight' && isAnswered) { nextTestQuestion(); }
+            }
+        });
+
+        // Inicjalizacja domyślnego ekranu nauki
+        loadCard();
+    </script>
+</body>
+</html>
