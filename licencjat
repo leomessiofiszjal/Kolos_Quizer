@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSTATNIE SPOTKANIE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Wodno-Steampunkowa Paleta */
+            --primary: #c5a059; /* Mosiądz / Złoto */
+            --primary-hover: #a88947; /* Stary mosiądz */
+            --secondary: #1a5276; /* Głęboka woda */
+            --bg-gradient: radial-gradient(circle at 50% 30%, #15404d 0%, #0a1b22 70%, #051014 100%);
+            --card-bg: rgba(240, 235, 216, 0.95); /* Stary pergamin z morskimi refleksami */
+            --text-main: #1a2e2e; /* Ciemna morska zieleń */
+            --text-light: #5d7a7a;
+            --success: #2a9d8f; /* Morski szmaragd */
+            --success-bg: #d4ece8;
+            --error: #a83232; /* Zardzewiała miedź */
+            --error-bg: #f0d9d9;
+            --brass-border: 2px solid #c5a059;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            box-sizing: border-box;
+            background-attachment: fixed;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--primary);
+            margin-top: 10px;
+            margin-bottom: 5px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 2.5em;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(197, 160, 89, 0.4), 0 2px 4px rgba(0,0,0,0.6);
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            color: #8eb0b0;
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 600;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .view-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .flashcard-container {
+            width: 100%;
+            max-width: 850px;
+            height: 450px;
+            perspective: 1200px;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.1);
+            transform-style: preserve-3d;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 0 1px rgba(197, 160, 89, 0.5), 0 0 25px rgba(10, 60, 80, 0.2);
+            border-radius: 8px;
+        }
+
+        .flashcard.is-flipped { transform: rotateX(180deg); }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background-color: var(--card-bg);
+            background-image: linear-gradient(rgba(255,255,255,0.1), rgba(0,0,0,0.05)); /* Delikatna tekstura pergaminu */
+            border-radius: 8px;
+            border: var(--brass-border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 50px;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 1.4em;
+            line-height: 1.6;
+            overflow-y: auto;
+            backdrop-filter: blur(3px);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .card-front { 
+            font-family: 'Cinzel', serif; 
+            font-weight: 600; 
+            font-size: 1.5em; 
+            color: var(--text-main); 
+            text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+        }
+        
+        .card-back { 
+            transform: rotateX(180deg); 
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.2em; 
+            text-align: left; 
+            align-items: flex-start; 
+            justify-content: flex-start; 
+            font-weight: 500;
+        }
+        
+        .card-back b { color: #8b5a2b; font-weight: 700; } /* Miedziany nacisk */
+        .card-back ul { margin-top: 10px; padding-left: 20px; }
+        .card-back li { margin-bottom: 12px; }
+
+        .card-face::-webkit-scrollbar { width: 8px; }
+        .card-face::-webkit-scrollbar-track { background: rgba(197, 160, 89, 0.1); border-radius: 4px; }
+        .card-face::-webkit-scrollbar-thumb { background-color: var(--primary); border-radius: 4px; }
+
+        .controls { display: flex; gap: 20px; align-items: center; margin-bottom: 25px; }
+
+        .action-btn {
+            font-family: 'Cinzel', serif;
+            background: linear-gradient(to bottom, #d4af6a, #c5a059);
+            color: #051014; 
+            border: 1px solid #a88947;
+            padding: 14px 28px;
+            border-radius: 4px; 
+            font-size: 1em; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.2s; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-btn:hover { 
+            background: linear-gradient(to bottom, #e0b970, #d4af6a); 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 15px rgba(197, 160, 89, 0.4), inset 0 1px 0 rgba(255,255,255,0.4);
+        }
+
+        .counter { 
+            font-family: 'Cinzel', serif;
+            font-size: 1.3em; 
+            font-weight: 800; 
+            color: var(--primary); 
+            min-width: 90px; 
+            text-align: center; 
+            text-shadow: 0 0 8px rgba(197, 160, 89, 0.5);
+        }
+
+        .secondary-controls { display: flex; gap: 15px; }
+        .secondary-controls button { 
+            background-color: rgba(11, 41, 53, 0.6); 
+            color: #8eb0b0; 
+            border: 1px solid rgba(142, 176, 176, 0.4); 
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600; 
+            font-size: 1.1em;
+            cursor: pointer; 
+            transition: 0.2s; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .secondary-controls button:hover { 
+            background-color: rgba(142, 176, 176, 0.2); 
+            color: #fff; 
+            border-color: #8eb0b0; 
+            box-shadow: 0 0 10px rgba(142, 176, 176, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>CZACIK. OSTATNIA LICENCJA</h1>
+    <div class="subtitle">Jedno pytanie - jedno ujebanie</div>
+
+    <div id="flashcard-view" class="view-section">
+        <div class="subtitle" style="margin-top:-20px; margin-bottom: 20px;">Spacja do obrotu karty. Strzałki do przełączania.</div>
+
+        <div class="flashcard-container" onclick="flipCard()">
+            <div class="flashcard" id="flashcard">
+                <div class="card-face card-front" id="card-front"></div>
+                <div class="card-face card-back" id="card-back"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="action-btn" onclick="prevCard()">&#8592; Poprzednie</button>
+            <div class="counter" id="counter">1 / 10</div>
+            <button class="action-btn" onclick="nextCard()">Następne &#8594;</button>
+        </div>
+
+        <div class="secondary-controls">
+            <button onclick="shuffleDeck()">Tasuj Pytania</button>
+            <button onclick="resetDeck()">Resetuj Kolejność</button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // BAZA PYTAŃ
+        // ==========================================
+        const rawQuizData = [
+            {
+                question: "1. Klasyfikacja oprogramowania komputerowego",
+                flashcardAnswer: "Ze względu na przeznaczenie dzielimy na:<br><ul><li><b>Systemowe:</b> Zarządza sprzętem, tworzy środowisko pracy (np. Windows, Linux).</li><li><b>Użytkowe (aplikacyjne):</b> Realizuje zadania zlecane przez użytkownika (np. pakiety biurowe, programy graficzne).</li><li><b>Programistyczne:</b> Służy do tworzenia i modyfikowania kodu (np. kompilatory, środowiska IDE).</li></ul>",
+                testOptions: [
+                    { text: "Kategoryzacja obejmuje warstwę systemową (jądro, sterowniki), użytkową (rozwiązującą problemy użytkownika) i programistyczną (narzędzia do wytwarzania oprogramowania).", isCorrect: true },
+                    { text: "Dzieli oprogramowanie na pakiety ERP wspomagające zarządzanie, systemy CRM do obsługi klienta i systemy operacyjne czasu rzeczywistego.", isCorrect: false },
+                    { text: "Obejmuje wyłącznie języki programowania niskiego i wysokiego poziomu oraz języki skryptowe powiązane z warstwą sprzętową.", isCorrect: false },
+                    { text: "Jest to podział na oprogramowanie sprzętowe (firmware), powłoki wiersza poleceń oraz systemy rozproszone.", isCorrect: false }
+                ]
+            },
+            {
+                question: "2. Charakterystyka systemów informatycznych zarządzania (SIZ)",
+                flashcardAnswer: "Zintegrowane systemy przetwarzające informacje do optymalizacji procesów i decyzji.<br>Główne klasy:<ul><li><b>ERP:</b> Zasoby przedsiębiorstwa (finanse, kadry).</li><li><b>CRM:</b> Zarządzanie relacjami z klientami.</li><li><b>SCM:</b> Łańcuch dostaw.</li><li><b>BI:</b> Hurtownie danych, systemy analityczne.</li></ul>Cechują się centralną bazą danych i modułowością.",
+                testOptions: [
+                    { text: "SIZ to środowiska oparte na architekturze modułowej i scentralizowanej relacyjnej bazie danych, agregujące m.in. logikę klas ERP, SCM, CRM i wspomagające analizy strategiczne.", isCorrect: true },
+                    { text: "Obejmują wyłącznie zdecentralizowane protokoły sieciowe łączące placówki firmy na całym świecie przy pomocy routingu BGP.", isCorrect: false },
+                    { text: "Są systemami jednowarstwowymi opartymi o pliki płaskie, które nie pozwalają na przetwarzanie transakcji w czasie rzeczywistym.", isCorrect: false },
+                    { text: "Jest to zbiór aplikacji freeware służących pracownikom do komunikacji wewnętrznej i przesyłania załączników biurowych.", isCorrect: false }
+                ]
+            },
+            {
+                question: "3. Rodzaje licencji oprogramowania",
+                flashcardAnswer: "Umowy prawne określające zasady użytkowania kodu:<ul><li><b>Komercyjne:</b> Płatne, zamknięty kod (zakaz modyfikacji).</li><li><b>Freeware:</b> Bezpłatne, zamknięty kod.</li><li><b>Shareware / Trial:</b> Okres próbny, limit funkcji.</li><li><b>Open Source:</b> Jawny kod (np. GPL wymaga dzielenia się zmianami, MIT pozwala na komercjalizację).</li><li><b>Public Domain:</b> Brak praw autorskich.</li></ul>",
+                testOptions: [
+                    { text: "Obejmują podziały na licencje komercyjne chroniące autorskie prawa majątkowe, różnorodne formy bezpłatne (freeware, shareware), wolne oprogramowanie (np. wirusowe GPL, permisywne MIT) i domenę publiczną.", isCorrect: true },
+                    { text: "Licencja GPL zezwala na zamykanie zmodyfikowanego kodu w produktach komercyjnych, w przeciwieństwie do licencji MIT, która zmusza do otwartości każdej pochodnej formy aplikacji.", isCorrect: false },
+                    { text: "Public Domain to specjalna licencja firmowa zezwalająca na używanie kodu tylko przez instytucje edukacyjne bez prawa do powielania na serwerach zewnętrznych.", isCorrect: false },
+                    { text: "Każda forma licencji Open Source kategorycznie zabrania czerpania korzyści finansowych z dystrybucji kodu oraz nakłada obowiązek uiszczania rocznych opłat certyfikacyjnych.", isCorrect: false }
+                ]
+            },
+            {
+                question: "4. System operacyjny - definicja i budowa",
+                flashcardAnswer: "Nadrzędne oprogramowanie pośredniczące między sprzętem a użytkownikiem.<br><b>Budowa:</b><ul><li><b>Jądro (Kernel):</b> Zarządza pamięcią, czasem procesora i procesami. Wymaga uprawnień.</li><li><b>Sterowniki (Drivers):</b> Interfejsy tłumaczące komendy dla konkretnego sprzętu.</li><li><b>System plików:</b> Logiczna organizacja danych.</li><li><b>Powłoka (Shell):</b> Interfejs tekstowy (CLI) lub graficzny (GUI) dla użytkownika.</li></ul>",
+                testOptions: [
+                    { text: "Jest oprogramowaniem systemowym pełniącym rolę abstrakcji sprzętowej. Centralne miejsce zajmuje jądro, wspierane przez moduły sterowników sprzętu, mechanizmy zarządzania plikami oraz powłokę interpretatora.", isCorrect: true },
+                    { text: "To oprogramowanie pośredniczące (middleware), które w pełni opiera się na zewnętrznych bibliotekach frameworków Java, pozbawione własnego bezpośredniego dostępu do rejestrów procesora.", isCorrect: false },
+                    { text: "Zdefiniowany jest jako abstrakcyjny system plików przechowujący wyłącznie kod wykonywalny aplikacji użytkowych bez możliwości alokacji pamięci operacyjnej.", isCorrect: false },
+                    { text: "Budowa ogranicza się do graficznego interfejsu użytkownika (GUI) i zintegrowanych przeglądarek WWW, delegując pełne zarządzenie przerwaniami aplikacjom klienckim.", isCorrect: false }
+                ]
+            },
+            {
+                question: "5. Zadania i role sieciowego systemu operacyjnego",
+                flashcardAnswer: "Oprogramowanie serwerowe zaprojektowane dla wielu użytkowników w sieci (np. Windows Server, dystrybucje Linux).<br><b>Zadania:</b><ul><li><b>Zarządzanie tożsamością:</b> Centralne logowanie i uprawnienia (np. Active Directory).</li><li><b>Współdzielenie:</b> Bezpieczny dostęp do plików i urządzeń peryferyjnych.</li><li><b>Usługi sieciowe:</b> Obsługa DNS, DHCP, hostowanie WWW.</li><li><b>Bezpieczeństwo:</b> Firewalle i ochrona transmisji w sieci LAN/WAN.</li></ul>",
+                testOptions: [
+                    { text: "Stanowi scentralizowane środowisko operacyjne zapewniające bezpieczne udostępnianie zasobów, utrzymanie integralności polis tożsamości (np. AD/LDAP) oraz ciągłe świadczenie usług infrastrukturalnych.", isCorrect: true },
+                    { text: "Jest to autonomiczny agent działający wyłącznie w środowiskach rozproszonych chmur publicznych, pozbawiony mechanizmów kontroli dostępu do dysków fizycznych.", isCorrect: false },
+                    { text: "Wspiera tylko usługi kierowania ruchem na warstwie fizycznej sieci OSI i rezygnuje całkowicie ze standardowych funkcji alokacji pamięci operacyjnej.", isCorrect: false },
+                    { text: "Sieciowe OS-y nie posiadają powłok zarządzania zasobami i służą jedynie do uruchamiania asynchronicznych zapytań kryptograficznych na portach brzegowych.", isCorrect: false }
+                ]
+            },
+            {
+                question: "6. Podstawowe technologie w tworzeniu stron i aplikacji webowych",
+                flashcardAnswer: "Składają się z dwóch podstawowych warstw:<br><ul><li><b>Front-end (wygląd i działanie w przeglądarce):</b> HTML5 (struktura szkieletu), CSS3 (style, układy) oraz JavaScript (logika, komunikacja z serwerem, dynamiczne zmiany). Często oparte o frameworki (React, Angular).</li><li><b>Back-end (serwer i dane):</b> Przetwarzanie logiki biznesowej z użyciem języków takich jak Python, Java, PHP, C# oraz obsługa połączonych relacyjnych lub nierelacyjnych baz danych.</li></ul>",
+                testOptions: [
+                    { text: "Architektura dzieli się na warstwę prezentacji klienckiej (przetwarzaną przez silniki przeglądarek bazując na DOM przy pomocy HTML, CSS i JS) oraz logikę serwerową zintegrowaną z systemami baz danych.", isCorrect: true },
+                    { text: "Zarówno logika biznesowa jak i schematy widoków implementowane są wyłącznie po stronie serwera relacyjnego, przeglądarka odczytuje natywne pliki wykonywalne (EXE) generowane w locie.", isCorrect: false },
+                    { text: "Struktury współczesnych stron pomijają całkowicie języki znaczników na rzecz wyłącznego renderowania grafiki rastrowej za pomocą bezstanowych zapytań UDP.", isCorrect: false },
+                    { text: "JavaScript jest przestarzałą i powoli wycofywaną technologią na front-endzie, w pełni zastępowaną obecnie przez statyczne kompilatory języka C generujące kod natywny do HTML.", isCorrect: false }
+                ]
+            },
+            {
+                question: "7. Podstawowe cechy relacyjnych baz danych",
+                flashcardAnswer: "Dane zorganizowane są według matematycznego modelu relacyjnego. Cechy:<ul><li><b>Tabele:</b> Reprezentacja dwuwymiarowa (wiersze = rekordy, kolumny = atrybuty).</li><li><b>Relacje:</b> Tworzone powiązania między tabelami na podstawie kluczy głównych (Primary Key) i obcych (Foreign Key).</li><li><b>Transakcje ACID:</b> Atomowość (wszystko albo nic), Spójność, Izolacja (niezależność równoległych), Trwałość (zapis zmian).</li><li><b>Język:</b> Komunikacja w zestandaryzowanym języku SQL.</li></ul>",
+                testOptions: [
+                    { text: "Organizacja wiedzy na podstawie encji i ich atrybutów (model dwuwymiarowych krotek), egzekwowanie rygorystycznej integralności referencyjnej poprzez klucze, spełnianie wymagań bezpiecznych transakcji w standardzie ACID, obsługa standardem SQL.", isCorrect: true },
+                    { text: "Wykorzystywanie elastycznych, samo-modyfikujących się schematów opartych na JSON w ramach pojedynczego węzła tabeli, pominięcie własności ACID by skalować połączenia horyzontalnie bez narzutu serwerowego.", isCorrect: false },
+                    { text: "Bazy te składają się z pojedynczej, płaskiej super-tabeli przetrzymującej zdenormalizowane bloki informacji, rezygnując z kluczy obcych aby uniknąć obciążających układ operacji łączeń (JOIN).", isCorrect: false },
+                    { text: "Wspieranie głównie języków programowania funkcjonalnego do definicji struktur, odrzucenie ograniczeń spójności (Consistency) w zamian za ciągłą, asynchroniczną dostępność do węzłów logicznych w sieci web.", isCorrect: false }
+                ]
+            },
+            {
+                question: "8. Podstawowe instrukcje języka zapytań SQL",
+                flashcardAnswer: "Składnia SQL dzieli się na wyspecjalizowane podgrupy:<ul><li><b>DML (Manipulacja danymi):</b> SELECT (pobranie z bazy), INSERT (dodanie nowego wiersza), UPDATE (zmiana wartości rekordu), DELETE (usunięcie wiersza).</li><li><b>DDL (Definicja schematu):</b> CREATE (tworzenie tabel/widoków), ALTER (modyfikacja budowy), DROP (kasowanie struktur).</li><li><b>DCL (Kontrola):</b> GRANT, REVOKE (nadawanie uprawnień).</li><li><b>TCL (Transakcje):</b> COMMIT (zatwierdzenie trwale), ROLLBACK (cofnięcie błędu).</li></ul>",
+                testOptions: [
+                    { text: "Polecenia standaryzowane, klasyfikowane zgodnie ze specyficznym zadaniem: Data Manipulation Language do rekursji informacji (np. SELECT/UPDATE), Data Definition Language do modyfikacji struktur w bazie (CREATE/ALTER) i Data Control Language (zabezpieczenia dostępu).", isCorrect: true },
+                    { text: "Podział obejmuje rozkazy iteracyjne (LOOP/WHILE) egzekwowane bezpośrednio na krotkach tabel oraz rozkazy warunkowe (IF/ELSE) pozwalające na tworzenie struktur DDL bez użycia słów kluczowych.", isCorrect: false },
+                    { text: "Z uwagi na relacyjny model ACID w SQL stosuje się jedynie zbiór dwóch podstawowych wektorów operacyjnych COMMIT dla wszystkich operacji wstawiania (DML) oraz DROP dla wszystkich form modyfikacji zapytań odczytu (DQL).", isCorrect: false },
+                    { text: "Podstawowy zbiór ogranicza się do metod modyfikacji interfejsu wizualnego aplikacji klienckiej za pośrednictwem kaskadowych instrukcji takich jak STYLE_TABLE, wykluczając interakcję z zawartością logiczną powiązanych krotek.", isCorrect: false }
+                ]
+            },
+            {
+                question: "9. Podstawowe konstrukcje programistyczne",
+                flashcardAnswer: "Niezależne od danego języka blokowe elementy logiczne:<ul><li><b>Zmienne / Typy danych:</b> Miejsca alokacji określonych danych (liczby całkowite, zmiennoprzecinkowe, logiczne, teksty).</li><li><b>Instrukcje warunkowe (Decyzje):</b> Wykonywanie różnych gałęzi kodu (if, else if, switch) na podstawie spełnienia logicznego warunku (True/False).</li><li><b>Pętle (Iteracje):</b> Wielokrotne powtarzanie kodu dopóki zachodzi warunek (for, while, do-while).</li><li><b>Funkcje / Podprogramy:</b> Wielokrotnego użytku nazwane bloki realizujące mniejsze podzadania, by uniknąć duplikacji kodu.</li></ul>",
+                testOptions: [
+                    { text: "Fundament imperatywnego paradygmatu weryfikujący przebieg logiki: deklarowanie buforów z zachowaniem ścisłego typowania (zmienne), sterowanie wektorami decyzji bazując na algebrze Boole'a (if/switch), bloki ułatwiające skróconą iterację (pętle for/while) i ustrukturyzowane izolowanie zachowań (funkcje podprogramów).", isCorrect: true },
+                    { text: "Obejmują wyłączne zastosowanie rekursywnej analizy logicznej całkowicie pozbawionej możliwości wykorzystania pętli iteracyjnych, wymuszając by wszystkie instrukcje zachodziły w liniowym cyklu warunkowym (wyłącznie sekwencje if...else).", isCorrect: false },
+                    { text: "Kluczowym elementem tych konstrukcji jest bezwzględny zakaz modularyzacji kodu; algorytmy tworzone są z jednego wielkiego liniowego bloku kodu ciągłego aby zapewnić płynność dla zarządzania pamięcią kompilatora.", isCorrect: false },
+                    { text: "To abstrakcyjne wzorce zarządzające powstawaniem klasycznych schematów relacyjnych w architekturach monolitycznych opartych na zdezintegrowanym zarządzaniu błędami za pomocą wbudowanych wyjątków systemowych sprzętu.", isCorrect: false }
+                ]
+            },
+            {
+                question: "10. Cechy programowania obiektowego",
+                flashcardAnswer: "Paradygmat (styl architektury) organizujący oprogramowanie jako byty (obiekty). 4 fundamenty (filary):<ul><li><b>Abstrakcja:</b> Skupianie się tylko na istotnych właściwościach problemu z odrzuceniem zbędnych dla danego zadania szczegółów.</li><li><b>Hermetyzacja (Enkapsulacja):</b> Chronienie modyfikacji danych w obiekcie przed zewnętrznym dostępem poprzez wydzielone, kontrolne publiczne metody.</li><li><b>Dziedziczenie:</b> Nowe obiekty uzyskują pola i zachowania obiektów z klas nadrzędnych.</li><li><b>Polimorfizm:</b> Możliwość równego używania metod o tych samych nazwach na rzecz różnych obiektów (ta sama metoda wewnątrz klasy podrzędnej zachowa się w unikalny sposób).</li></ul>",
+                testOptions: [
+                    { text: "Model architektoniczny zorganizowany wokół obiektów implementujących własny stan logiczny z kontrolą dostępu przez określony kontrakt metod publicznych (Enkapsulacja), reutylizujący zależności strukturalne hierarchią klas (Dziedziczenie), opierający się na modelowaniu esencji zjawisk (Abstrakcja) oraz elastyczności interfejsów przy nadpisywaniu akcji (Polimorfizm).", isCorrect: true },
+                    { text: "Wyklucza zastosowanie modułowej ukrywalności danych i metod w klasach celem łatwego globalnego mapowania procesów. Fundamentem paradygmatu jest zastąpienie dziedziczenia struktur restrykcyjnymi wzorcami proceduralnymi, całkowicie zależnymi od płaskiej modyfikacji instrukcji skoku.", isCorrect: false },
+                    { text: "Istotą paradygmatu jest odrzucenie pojęcia typów i hierarchii; kod traktowany jest jako abstrakcyjny zbiór powiązanych liniowo funkcji matematycznych w całkowitej izolacji operacyjnej od modyfikowalnego stanu zmiennych pamięci (hermetyzacja w znaczeniu uniemożliwienia zapisu danych po kompilacji).", isCorrect: false },
+                    { text: "Cechą wyróżniającą polimorfizmu jest możliwość przypisywania nieograniczonych stanów bazodanowych ACID poprzez pojedynczy klucz referencyjny do klasy nadrzędnej, unikając w ten sposób wymogu abstrakcyjnego oddzielenia danych implementacji i hermetyzując klasę w zdenormalizowanej postaci powiązań wektorowych.", isCorrect: false }
+                ]
+            },
+            {
+                question: "11. Struktury danych stosowane w programowaniu aplikacji",
+                flashcardAnswer: "Struktury danych to sposoby organizacji informacji w pamięci maszynowej. Główne typy:<ul><li><b>Tablice (Arrays):</b> Zbiór elementów tego samego typu o stałym rozmiarze, dostępny przez indeks.</li><li><b>Listy (Lists):</b> Dynamiczne kolekcje, gdzie elementy mogą być swobodnie dodawane i usuwane.</li><li><b>Stosy (Stacks):</b> Struktura typu LIFO (Last In, First Out).</li><li><b>Kolejki (Queues):</b> Struktura typu FIFO (First In, First Out).</li><li><b>Drzewa i Grafy:</b> Hierarchiczne i relacyjne struktury danych ułatwiające wyszukiwanie.</li><li><b>Słowniki/Mapy:</b> Przechowują dane w asocjacyjnych parach klucz-wartość.</li></ul>",
+                testOptions: [
+                    { text: "Obejmują m.in. tablice (stały rozmiar), listy dynamiczne, struktury LIFO (stosy), FIFO (kolejki) oraz mapy przechowujące pary klucz-wartość.", isCorrect: true },
+                    { text: "Są to wyłącznie pętle i instrukcje warunkowe stosowane w algorytmach do sterowania przepływem programu.", isCorrect: false },
+                    { text: "Struktury danych to fizyczne układy ścieżek na płycie głównej służące do przesyłania informacji z pamięci RAM do procesora.", isCorrect: false },
+                    { text: "Dzielą się wyłącznie na bazy danych SQL oraz NoSQL, ignorując całkowicie wewnętrzne mechanizmy alokacji pamięci aplikacji.", isCorrect: false }
+                ]
+            },
+            {
+                question: "12. Procesy wytwarzania oprogramowania: specyfika, kluczowe etapy, przykłady",
+                flashcardAnswer: "Zbiór działań inżynierskich prowadzących do powstania systemu informatycznego.<br><b>Kluczowe etapy:</b> Analiza wymagań, Projektowanie, Implementacja (kodowanie), Testowanie, Wdrożenie i Pielęgnacja.<br><b>Przykłady modeli cyklu życia:</b><ul><li><b>Kaskadowy (Waterfall):</b> Liniowy, każdy etap musi się zakończyć przed rozpoczęciem kolejnego.</li><li><b>Zwinne (Agile):</b> Iteracyjne i przyrostowe, wysoce elastyczne i adaptacyjne (np. Scrum).</li><li><b>Spiralny:</b> Łączy cechy modelu kaskadowego z wczesnym prototypowaniem, kładąc nacisk na analizę ryzyka.</li></ul>",
+                testOptions: [
+                    { text: "Składają się z analizy, projektowania, implementacji, testowania i wdrożenia. Główne modele to m.in. kaskadowy (liniowy) oraz zwinny (iteracyjny).", isCorrect: true },
+                    { text: "Obejmują wyłącznie proces pisania kodu źródłowego, ignorując całkowicie fazy planowania, testowania i utrzymania systemu po wdrożeniu.", isCorrect: false },
+                    { text: "Ich jedynym zadaniem jest wygenerowanie kluczy licencyjnych dla oprogramowania udostępnianego następnie w domenie publicznej.", isCorrect: false },
+                    { text: "To procedury fizycznego montażu podzespołów komputerowych w serwerowniach przed uruchomieniem systemów operacyjnych na maszynach.", isCorrect: false }
+                ]
+            },
+            {
+                question: "13. Role, ceremonie i artefakty w podejściu Scrum",
+                flashcardAnswer: "Scrum to iteracyjne ramy postępowania (framework Agile).<br><ul><li><b>Role:</b> Product Owner (odpowiada za wizję i wartość biznesową produktu), Scrum Master (dba o proces, wspiera zespół, usuwa przeszkody), Developers (zespół wytwórczy realizujący zadania).</li><li><b>Ceremonie:</b> Sprint (ramy czasowe na iterację), Sprint Planning (planowanie celów i zadań), Daily Scrum (codzienna krótka synchronizacja pracy), Sprint Review (przegląd rezultatów), Sprint Retrospective (analiza i usprawnienie procesu na przyszłość).</li><li><b>Artefakty:</b> Product Backlog (spis wszystkich wymagań), Sprint Backlog (zadania wybrane na dany Sprint), Increment (działający przyrost oprogramowania).</li></ul>",
+                testOptions: [
+                    { text: "Role to Product Owner, Scrum Master i Zespół; ceremonie to m.in. Sprint i Daily Scrum; artefakty to Product Backlog, Sprint Backlog i Inkrement.", isCorrect: true },
+                    { text: "Role to Project Manager, Tester i Analityk; ceremonie obejmują wyłącznie formalne testy jednostkowe; artefaktem jest ostateczny kod źródłowy.", isCorrect: false },
+                    { text: "To model oparty na rygorystycznej hierarchii, w której lider podejmuje wszystkie decyzje projektowe bez udziału iteracyjnych ceremonii i artefaktów.", isCorrect: false },
+                    { text: "Podejście polegające na opracowaniu i podpisaniu pełnej dokumentacji technicznej i projektowej przed rozpoczęciem jakichkolwiek prac programistycznych w zespole.", isCorrect: false }
+                ]
+            },
+            {
+                question: "14. Sposoby dokumentowania wymagań systemowych",
+                flashcardAnswer: "Proces definiowania i utrwalania oczekiwanych funkcji oraz ograniczeń systemu. Formy dokumentacji:<ul><li><b>Specyfikacja Wymagań Oprogramowania (SRS):</b> Formalny, szczegółowy dokument opisujący techniczne wymagania funkcjonalne i niefunkcjonalne.</li><li><b>Przypadki użycia (Use Cases):</b> Narracyjny opis interakcji między aktorem zewnętrznym (np. użytkownikiem) a systemem.</li><li><b>User Stories (Historyjki użytkownika):</b> Krótkie definicje wartości z perspektywy użytkownika, charakterystyczne dla metodyk zwinnych.</li><li><b>Modele i diagramy:</b> Notacje graficzne, takie jak diagramy języka UML oraz makiety poglądowe interfejsu (wireframes).</li></ul>",
+                testOptions: [
+                    { text: "Wykorzystuje się formalne specyfikacje (np. SRS), przypadki użycia opisujące interakcje, zwinne historyjki użytkownika (User Stories) oraz notacje graficzne i makiety.", isCorrect: true },
+                    { text: "Wymagania systemowe dokumentuje się i weryfikuje wyłącznie poprzez wprowadzanie komentarzy wewnątrz finalnego kodu źródłowego gotowej aplikacji.", isCorrect: false },
+                    { text: "Jedynym dopuszczalnym z inżynieryjnego punktu widzenia sposobem jest tworzenie logów z błędami systemowymi w trakcie eksploatacji.", isCorrect: false },
+                    { text: "Dokumentacja tego typu sprowadza się wyłącznie do rygorystycznego rejestrowania parametrów fizycznych sprzętu komputerowego, na którym system będzie uruchamiany.", isCorrect: false }
+                ]
+            },
+            {
+                question: "15. Modelowanie struktury i dynamiki systemu w języku UML",
+                flashcardAnswer: "UML (Unified Modeling Language) to powszechny standard graficznego modelowania oprogramowania obiektowego. Kategoryzacja diagramów:<ul><li><b>Diagramy strukturalne (statyczne):</b> Obrazują architekturę i fizyczną budowę systemu niezależnie od czasu. Główne typy to Diagram klas (fundament obiektowy, atrybuty i powiązania) oraz Diagram komponentów.</li><li><b>Diagramy dynamiczne (behawioralne):</b> Opisują zachowanie, przepływ sterowania i interakcje systemu w czasie. Obejmują m.in. Diagram przypadków użycia, Diagram sekwencji (wymiana komunikatów chronologicznie) oraz Diagram aktywności (przepływy procesów).</li></ul>",
+                testOptions: [
+                    { text: "Język UML dzieli się na diagramy strukturalne (np. diagram klas) opisujące stałą architekturę, oraz dynamiczne (np. diagram sekwencji i aktywności) przedstawiające zachowanie systemu.", isCorrect: true },
+                    { text: "Język UML służy wyłącznie do technicznego projektowania graficznych interfejsów użytkownika (GUI) w aplikacjach desktopowych i nie modeluje logiki oraz struktur danych.", isCorrect: false },
+                    { text: "Jest to zaawansowany język skryptowy służący do automatycznego i bezpośredniego generowania kodu źródłowego bez konieczności przechodzenia przez fazę analizy.", isCorrect: false },
+                    { text: "Modelowanie UML ogranicza się stricte do tworzenia matematycznych modeli relacyjnych baz danych w serwerowniach z całkowitym pominięciem zachowania aplikacji klienckich.", isCorrect: false }
+                ]
+            },
+            {
+                question: "16. Zalety i wady relacyjnych i nierelacyjnych modeli danych",
+                flashcardAnswer: "<b>Modele relacyjne (SQL):</b><br><i>Zalety:</i> Gwarancja integralności, transakcyjność (ACID), standaryzowany język zapytań (SQL), silnie ustalone relacje w tabelach.<br><i>Wady:</i> Problematyczne i kosztowne skalowanie poziome (horyzontalne), ograniczona elastyczność przy zmianie struktury danych.<br><b>Modele nierelacyjne (NoSQL):</b><br><i>Zalety:</i> Wybitna skalowalność pozioma dla dużych zbiorów (Big Data), elastyczność formatów (brak sztywnego schematu tabel), optymalizacja pod wydajność.<br><i>Wady:</i> Częste porzucenie spójności transakcyjnej ACID, konieczność nauki odrębnych metod dostępu do danych, ograniczenia przy wysoce złożonych łączeniach (zjawisko redundancji).",
+                testOptions: [
+                    { text: "Modele relacyjne gwarantują stabilność i zgodność ACID, lecz trudniej się skalują. Rozwiązania nierelacyjne cechują się dużą wydajnością skalowania poziomego i elastycznością struktury, jednak rezygnują z pełnej ścisłości powiązań.", isCorrect: true },
+                    { text: "Systemy relacyjne nie posiadają żadnego zestandaryzowanego języka do komunikacji z serwerem, w przeciwieństwie do architektur nierelacyjnych, które bezwzględnie egzekwują pełną atomowość transakcji w rozproszonych klastrach.", isCorrect: false },
+                    { text: "Bazy nierelacyjne w całości wykorzystują struktury wielowymiarowych tabel połączonych kluczami obcymi, podczas gdy bazy relacyjne przetrzymują dane wyłącznie w oparciu o płaskie pliki dokumentów JSON.", isCorrect: false },
+                    { text: "Z inżynieryjnego punktu widzenia obie technologie są identyczne w wydajności i strukturze zapisu; podstawową różnicą determinującą wybór w badaniach jest jedynie wymóg płatnej, korporacyjnej licencji w wariancie nierelacyjnym.", isCorrect: false }
+                ]
+            },
+            {
+                question: "17. Cechy języków skryptowych - HTML5 i JavaScript",
+                flashcardAnswer: "<b>HTML5:</b> Nie kwalifikuje się jako język programowania; jest to opisowy język znaczników (Markup Language). Definiuje szkielet, strukturę i semantykę treści dokumentu webowego, zapewniając przy tym natywne wsparcie przeglądarek dla multimediów i grafiki z wykorzystaniem elementu canvas.<br><b>JavaScript (JS):</b> Stanowi pełnoprawny, interpretowany język skryptowy. Cechuje się dynamicznym typowaniem zmiennych i wieloparadygmatowością. W warstwie webowej realizuje logikę, manipuluje drzewem obiektowym DOM w reakcji na akcje użytkownika oraz umożliwia przeprowadzanie asynchronicznych operacji z użyciem zapytań sieciowych.",
+                testOptions: [
+                    { text: "HTML5 służy jako opisowy język znaczników do kreowania i nadawania semantyki strukturze strony. JavaScript to pełnoprawny język programowania powołany do dostarczania logiki, interakcji i asynchronicznej manipulacji elementami DOM.", isCorrect: true },
+                    { text: "HTML5 jest niskopoziomowym językiem maszynowym działającym na backendzie serwera, podczas gdy JavaScript odpowiedzialny jest jedynie za definicje kaskadowych arkuszy stylów i barw bez wprowadzania elementu logiki.", isCorrect: false },
+                    { text: "Stanowią wysoce specyficzne technologie korporacyjne rozwijane celem uruchamiania natywnych procesów w izolowanych środowiskach systemów operacyjnych urządzeń typu mainframe, rezygnując z renderowania na frontendzie.", isCorrect: false },
+                    { text: "JavaScript to zaawansowany silnik relacyjnej bazy danych do obsługi autoryzacji systemowej serwera, a w przeciwieństwie do niego HTML5 implementuje operacje na protokołach kontroli i szyfrowania transmisji połączeń warstwy TCP/IP.", isCorrect: false }
+                ]
+            },
+            {
+                question: "18. Wersjonowanie aplikacji",
+                flashcardAnswer: "Kluczowa praktyka zarządzania inżynierią kodu źródłowego (SCM).<br><b>Zastosowanie:</b> Zapobiega utracie postępów dzięki rejestrowaniu, kontrolowaniu i archiwizowaniu kolejnych inkrementów i edycji całego projektu na przestrzeni czasu. Umożliwia asynchroniczną i bezkonfliktową współpracę programistów poprzez realizowanie zadań na odizolowanych odgałęzieniach (branch). Zapewnia audyt modyfikacji oraz ścieżki powrotu (rollback) do stabilnych wydań. <br><b>Oprzyrządowanie:</b> Dominują systemy rozproszone na czele z technologią Git, wykorzystującą najczęściej serwisy hostingowe takie jak GitHub czy GitLab. W dystrybucji stosuje się notację semantyczną dla wydań (Major.Minor.Patch).",
+                testOptions: [
+                    { text: "Proces koordynowania wydań i historii modyfikacji na kodzie (np. narzędziem Git). Pozwala zespołom na bezkonfliktowe zrównoleglenie pracy z użyciem wydzielonych gałęzi (branching) oraz bezpieczny powrót do stabilnych punktów aplikacji.", isCorrect: true },
+                    { text: "Terminologia ta opisuje zautomatyzowany proces transformacji statycznego kodu źródłowego napisanego w edytorze na wykonywalny plik binarny przeznaczony dla konkretnej architektury procesora lokalnego klienta docelowego.", isCorrect: false },
+                    { text: "Oznacza procedurę prawną dokonywaną u notariusza, wymuszającą całkowitą i nieodwracalną zmianę licencji komercyjnej projektu programistycznego po wejściu produktu w fazę komercyjnej eksploatacji w chmurze obliczeniowej.", isCorrect: false },
+                    { text: "Sprowadza się to do fizycznej minimalizacji oraz bezstratnego kompresowania finalnych bibliotek obiektowych za pomocą standardu ZIP w celu oszczędzenia objętości przestrzeni dyskowej przed wdrożeniem produkcyjnym sieci LAN.", isCorrect: false }
+                ]
+            },
+            {
+                question: "19. Korzyści i wyzwania programowania aplikacji wieloplatformowych",
+                flashcardAnswer: "Tworzenie ujednoliconej bazy kodu zdatnej do wielokrotnego użytku i wdrażania natywnie na rożnych systemach (iOS, Android, Web) za sprawą bibliotek (np. React Native, Flutter).<br><b>Korzyści:</b> Optymalizacja finansowa budżetu (jeden zespół wytwórczy deweloperów), gwałtowniejsze wejście na rynek (Time-To-Market) przy wykorzystaniu ujednoliconych testów funkcjonalnych i obniżenie nakładów na podtrzymywanie wersji.<br><b>Wyzwania:</b> Kompromisy przy ogólnej wydajności w konfrontacji z językami natywnymi, bariery w natychmiastowym i bezproblemowym wdrażaniu nowości ze wbudowanych interfejsów sprzętowych konkretnego urządzenia w aktualizacjach API systemu OS oraz problematyczne i kosztowne dostrajanie różnic interfejsów UI do lokalnych wymogów estetyki poszczególnej architektury.",
+                testOptions: [
+                    { text: "Główny atut stanowi drastyczna redukcja kosztów wytwarzania na etapie współdzielenia pojedynczego kodu na środowiskach wielu platform. Błędami implementacji oraz kompromisami bywają problemy z integracją natywnej architektury UI i stratą na mocy obliczeniowej podzespołów.", isCorrect: true },
+                    { text: "Największą zaletą jest bezwzględne obniżenie opóźnień wykonywania instrukcji dla każdego z systemów względem języków natywnych. Znacznym wyzwaniem pozostaje jednak konieczność rozpisania zupełnie nowego algorytmu przez osobny zespół do każdego docelowego procesora docelowego firmy sprzętowej.", isCorrect: false },
+                    { text: "Dostarczają ogromną wartość z racji całkowitego ominięcia i braku potrzeby stosowania pamięci w systemie. Trudność i duże wyzwanie pojawia się z tytułu braku komercyjnej zgody na wprowadzanie takich produktów do dystrybucji na jakimkolwiek oficjalnym sklepie udostępniającym aplikacje cyfrowe.", isCorrect: false },
+                    { text: "Wykluczają jakikolwiek wymóg manualnego testowania jakości (QA), przez co przyspiesza logistyka projektu w sieci, aczkolwiek główną przeszkodą dla zespołów bywa ich ograniczenie uruchomieniowe wyłącznie do ogromnych architektur centralnych wykorzystywanych na serwerach stacjonarnych i komputerach typu mainframe.", isCorrect: false }
+                ]
+            },
+            {
+                question: "20. Programowanie dynamicznych serwisów internetowych ASP",
+                flashcardAnswer: "ASP.NET Core to opracowany w firmie Microsoft wieloplatformowy framework programistyczny do dostarczania rozwiązań backendowych.<br><b>Istota budowy:</b><ul><li>Logika serwerowa programowana jest kompilowanym w czasie rzeczywistym językiem C# na uniwersalnym środowisku wykonawczym .NET.</li><li>Platforma powszechnie egzekwuje stosowanie modularnego wzorca architektonicznego MVC (Model-View-Controller) rozdzielającego dane w encjach, renderowany front oraz wyliczanie operacji.</li><li>Odpowiada za bezpieczne generowanie dokumentu dla zapytania połączone silnie z relacyjnymi i obiektowymi narzędziami dla ekosystemu firmy Microsoft.</li></ul>",
+                testOptions: [
+                    { text: "Jest to infrastruktura technologiczna Microsoftu (aktualnie najczęściej ASP.NET Core) oparta na języku kompilowanym C#, dedykowana konstruowaniu warstwy zapytań serwerowych, implementująca do swoich głównych działań powszechny, ustrukturyzowany wzorzec Model-Widok-Kontroler.", isCorrect: true },
+                    { text: "Struktura ta kwalifikuje się jako przeglądarkowy mechanizm oparty na znacznikach formatowania i stylizowania, stanowiący stary, lecz przestarzały zamiennik do definiowania kaskadowych arkuszy układu (CSS) używanych domyślnie pod wyświetlanie wizualne przez użytkowników klienckich.", isCorrect: false },
+                    { text: "Zostało stworzone jako ściśle wektorowe środowisko projektowe zorientowane na operowanie rysunkiem sprzętowym i generowanie oprogramowania klienckiego w postaci wyłącznie trójwymiarowych layoutów dostosowanych do przeglądarek mobilnych bez wymogu weryfikacji przez maszyny na serwerowniach backendowych", isCorrect: false },
+                    { text: "Kluczowym elementem tej specyfiki bazodanowej dla sieci z serwerem i systemem plików jest stworzenie jej jako całkowite open-source do administrowania modelem relacyjnym, stanowiące bezpośrednią, legalną i bezpłatną referencję inżynieryjną, wymierzoną przeciw komercyjnemu oprogramowaniu marki Oracle w obszarze tabel dla baz SQL", isCorrect: false }
+                ]
+            },
+            {
+                question: "21. Adresowanie logiczne i fizyczne w sieciach komputerowych",
+                flashcardAnswer: "Mechanizmy identyfikacji węzłów w sieciach komputerowych.<ul><li><b>Adres fizyczny (MAC):</b> Sprzętowy identyfikator o długości 48 bitów, na stałe wpisany w kartę sieciową (NIC). Działa w warstwie łącza danych (warstwa 2 OSI) i służy do komunikacji wewnątrz lokalnej domeny rozgłoszeniowej (LAN).</li><li><b>Adres logiczny (IP):</b> Programowy, hierarchiczny identyfikator nadawany tymczasowo lub statycznie. Działa w warstwie sieciowej (warstwa 3 OSI) i jest kluczowy do wyznaczania tras (routingu) pakietów pomiędzy różnymi podsieciami na skalę globalną (np. w internecie).</li></ul>",
+                testOptions: [
+                    { text: "Adres fizyczny (MAC) to sprzętowy identyfikator karty w sieci lokalnej (warstwa 2 OSI), natomiast adres logiczny (IP) to programowy identyfikator używany do routingu pakietów w sieciach rozległych (warstwa 3 OSI).", isCorrect: true },
+                    { text: "Adres logiczny jest wbudowany na stałe w procesor, a adres fizyczny to tymczasowy numer nadawany przez przeglądarkę internetową w celu nawiązania szyfrowanego połączenia.", isCorrect: false },
+                    { text: "Adresowanie fizyczne dotyczy wyłącznie kabli światłowodowych, podczas gdy adresowanie logiczne stosuje się tylko w połączeniach bezprzewodowych Wi-Fi w budynkach użyteczności publicznej.", isCorrect: false },
+                    { text: "Adres MAC (logiczny) służy do ustalania tras pomiędzy kontynentami, a adres IP (fizyczny) jest przypisany na stałe do płyty głównej komputera bezpośrednio w fabryce producenta.", isCorrect: false }
+                ]
+            },
+            {
+                question: "22. Przełączniki sieciowe - role i typowe technologie",
+                flashcardAnswer: "Przełącznik (Switch) to aktywne urządzenie infrastruktury sieciowej operujące w warstwie łącza danych (warstwa 2).<br><b>Rola:</b> Mikrosegmentacja sieci. Łączy urządzenia w sieci LAN, analizuje ramki i przekazuje je wyłącznie do docelowego portu bazując na tworzonej dynamicznie tablicy adresów MAC, co drastycznie redukuje kolizje.<br><b>Typowe technologie:</b><ul><li><b>VLAN (Virtual LAN):</b> Logiczne dzielenie jednego przełącznika na wiele odseparowanych sieci w celu poprawy bezpieczeństwa i wydajności.</li><li><b>STP (Spanning Tree Protocol):</b> Protokół zapobiegający niszczącym pętlom warstwy 2 w topologiach redundantnych.</li><li><b>PoE (Power over Ethernet):</b> Zasilanie urządzeń peryferyjnych (np. kamer IP, telefonów VoIP) bezpośrednio przez kabel sieciowy (skrętkę).</li></ul>",
+                testOptions: [
+                    { text: "Urządzenie warstwy łącza danych przekazujące ramki na podstawie adresów MAC w obrębie sieci LAN. Typowe wspierane technologie to wirtualne sieci VLAN, protokoły zapobiegające pętlom (np. STP) oraz zasilanie przez kabel (PoE).", isCorrect: true },
+                    { text: "Przełączniki działają w warstwie aplikacji, a ich główną i jedyną rolą jest renderowanie żądań stron internetowych z wykorzystaniem bezpiecznych protokołów HTTP oraz SSL.", isCorrect: false },
+                    { text: "Są to urządzenia sprzętowe służące wyłącznie do globalnego przydzielania adresów IP w internecie za pomocą protokołu DHCP, całkowicie pozbawione możliwości analizowania tablic MAC.", isCorrect: false },
+                    { text: "Główną rolą przełącznika jest szyfrowanie wszystkich danych gromadzonych na dyskach twardych komputerów w sieci lokalnej z wykorzystaniem sprzętowej technologii macierzy RAID.", isCorrect: false }
+                ]
+            },
+            {
+                question: "23. Problematyka routingu w sieciach WAN",
+                flashcardAnswer: "Routing w sieciach WAN to złożony proces wyznaczania optymalnych ścieżek dla pakietów IP pomiędzy węzłami rozsianymi na dużych obszarach geograficznych.<br><b>Kluczowe zagadnienia i problemy:</b><ul><li><b>Skalowalność:</b> Utrzymanie i ciągła aktualizacja ogromnych tablic routingu w sieciach o rozmiarze internetu.</li><li><b>Zbieżność sieci (Convergence):</b> Czas, w jakim wszystkie routery aktualizują wiedzę o topologii po awarii łącza. Szybka zbieżność minimalizuje utratę pakietów.</li><li><b>Wybór metryki:</b> Optymalizacja trasy pod kątem różnych parametrów (opóźnienia, przepustowość, obciążenie, koszt łącza).</li><li><b>Protokoły:</b> Zastosowanie odpowiednich protokołów dynamicznych: IGP wewnątrz systemów autonomicznych (np. OSPF) i EGP pomiędzy nimi (np. BGP).</li></ul>",
+                testOptions: [
+                    { text: "Obejmuje proces wyboru optymalnych ścieżek dla pakietów wspierany protokołami dynamicznymi (np. BGP, OSPF). Główne wyzwania techniczne to zapewnienie szybkiej zbieżności po awarii, unikanie pętli oraz skalowalność ogromnych tablic routingu.", isCorrect: true },
+                    { text: "Problematyka routingu WAN ogranicza się do przydzielania adresów fizycznych MAC w obrębie jednego zamkniętego obszaru biurowego za pomocą kabli miedzianych koncentrycznych.", isCorrect: false },
+                    { text: "Polega na rygorystycznym, manualnym wpisywaniu statycznych ścieżek przez administratorów bezpośrednio do każdego systemu operacyjnego klienta, z całkowitym pominięciem jakichkolwiek protokołów dynamicznych.", isCorrect: false },
+                    { text: "Dotyczy wyłącznie problemów ze sterownikami kart graficznych serwerów webowych, które w niekontrolowany sposób spowalniają przesyłanie obrazu w sieciach rozległych między węzłem a monitorem użytkownika końcowego.", isCorrect: false }
+                ]
+            },
+            {
+                question: "24. Istota cloud computing",
+                flashcardAnswer: "Chmura obliczeniowa (Cloud Computing) to model dostarczania usług informatycznych (mocy obliczeniowej, pamięci, baz danych, oprogramowania) na żądanie za pośrednictwem internetu.<br><b>Istota i korzyści:</b> Rezygnacja z utrzymywania własnych, kosztownych serwerowni fizycznych na rzecz dzierżawy zasobów od dostawców (np. AWS, Azure). Rozliczenie następuje najczęściej w modelu abonamentowym (pay-as-you-go). Umożliwia to elastyczną skalowalność (błyskawiczne dodawanie lub usuwanie zasobów) i wysoką dostępność.<br><b>Modele usługowe:</b><ul><li><b>IaaS (Infrastruktura):</b> Dostarczanie wirtualnych maszyn i sieci.</li><li><b>PaaS (Platforma):</b> Dostarczanie środowiska do pisania i hostowania aplikacji (bez zarządzenia systemem OS).</li><li><b>SaaS (Oprogramowanie):</b> Gotowe aplikacje dostępne przez przeglądarkę (np. Office 365, systemy CRM).</li></ul>",
+                testOptions: [
+                    { text: "Udostępnianie zasobów obliczeniowych i usług IT przez internet w elastycznym modelu na żądanie (kategorie: IaaS, PaaS, SaaS), co pozwala na dynamiczną skalowalność i redukcję kosztów utrzymania własnej infrastruktury sprzętowej.", isCorrect: true },
+                    { text: "Jest to technologia budowy całkowicie odciętych serwerowni wewnątrz pomieszczeń biurowych firmy, polegająca na fizycznym izolowaniu sieci od publicznego internetu w celu zapewnienia maksymalnego bezpieczeństwa.", isCorrect: false },
+                    { text: "Oznacza procedurę wymuszającą lokalną instalację wszystkich programów narzędziowych oraz systemów antywirusowych bezpośrednio z fizycznych nośników pamięci (np. płyt CD lub pendrive).", isCorrect: false },
+                    { text: "Model biznesowy polegający wyłącznie na sprzedawaniu stacji roboczych o wysokiej wydajności do renderowania grafiki wideo, bez konieczności nawiązywania jakichkolwiek połączeń z zewnętrznymi centrami danych.", isCorrect: false }
+                ]
+            },
+            {
+                question: "25. Metody oraz strategie testowania oprogramowania",
+                flashcardAnswer: "Proces weryfikacji i walidacji oprogramowania względem zdefiniowanych wymagań oraz wykrywania defektów przed wdrożeniem.<br><b>Główne metody:</b><ul><li><b>Czarna skrzynka (Black-box):</b> Tester analizuje system wyłącznie na podstawie wejść i generowanych wyjść, nie znając struktury wewnętrznej kodu. Weryfikuje zgodność z wymaganiami biznesowymi.</li><li><b>Biała skrzynka (White-box):</b> Testowanie kodu z pełną znajomością jego struktury, logiki, algorytmów i przepływów (często wykonywane przez samych programistów).</li></ul><b>Strategie zarządzania testami:</b> Obejmują testy manualne vs testy automatyczne (wykorzystanie skryptów), a także bardzo istotne <b>Testy regresyjne</b> (ponowne weryfikowanie niezmienionych części systemu, aby upewnić się, że wprowadzenie nowych funkcji lub naprawa błędów nie zepsuły dotychczasowego działania).",
+                testOptions: [
+                    { text: "Obejmują podział na metodę czarnej skrzynki (weryfikacja działania interfejsu bez znajomości kodu) oraz białej skrzynki (testowanie przepływów wewnętrznych i architektury), uzupełnione o strategie wdrażania testów automatycznych czy regresyjnych.", isCorrect: true },
+                    { text: "Testowanie oprogramowania opiera się w głównej mierze na metodzie fizycznego odłączania zasilania w trakcie trwania krytycznych procesów serwera, w celu zmierzenia odporności sprzętu na fluktuacje prądu.", isCorrect: false },
+                    { text: "Metody sprowadzają się wyłącznie do rygorystycznego zakazu dokonywania kompilacji kodu źródłowego przed oficjalnym opublikowaniem struktury plików dla użytkowników końcowych w środowisku produkcyjnym.", isCorrect: false },
+                    { text: "Obejmuje jedno, uniwersalne podejście polegające jedynie na sprawdzaniu poprawności literówek w graficznym interfejsie użytkownika, ignorując całkowicie walidację logiki biznesowej i przepływu transakcji w bazie danych.", isCorrect: false }
+                ]
+            },
+            {
+                question: "26. Poziomy testowania",
+                flashcardAnswer: "Poziomy testowania organizują proces weryfikacji oprogramowania w logiczną hierarchię, od najmniejszych składowych po cały system:<ul><li><b>Testy jednostkowe (Modułowe):</b> Weryfikacja najmniejszych testowalnych części kodu (klas, funkcji) w pełnej izolacji. Najszybsze, wyłapują błędy logiczne w algorytmach.</li><li><b>Testy integracyjne:</b> Sprawdzanie poprawności interakcji, interfejsów i przepływu danych pomiędzy połączonymi modułami lub zewnętrznymi usługami (np. API, baza danych).</li><li><b>Testy systemowe:</b> Walidacja całego, w pełni zintegrowanego systemu względem wymagań niefunkcjonalnych i funkcjonalnych na środowisku zbliżonym do produkcyjnego.</li><li><b>Testy akceptacyjne (UAT):</b> Wykonywane na samym końcu przez klienta (lub reprezentujących go interesariuszy) w celu potwierdzenia, że system rozwiązuje postawiony problem biznesowy i nadaje się do wdrożenia.</li></ul>",
+                testOptions: [
+                    { text: "Klasyczny cykl weryfikacji dzieli się na warstwy: testy jednostkowe (wykonywane na izolowanych funkcjach), integracyjne (badające komunikację między komponentami), systemowe (weryfikacja zachowań całości) oraz akceptacyjne (odbiór biznesowy i zatwierdzenie przez interesariuszy).", isCorrect: true },
+                    { text: "Poziomy te odnoszą się ściśle do administracji uprawnieniami w relacyjnych bazach danych, określając przyzwolenie na wykonywanie inwazyjnych poleceń strukturalnych takich jak DELETE czy DROP w zależności od wagi błędu.", isCorrect: false },
+                    { text: "Testowanie dzieli się wyłącznie na dwa niezależne poziomy: poziom testowania parametrów wydajnościowych czysto sprzętowych (CPU, RAM) oraz poziom oceny okablowania w architekturze fizycznej budynku.", isCorrect: false },
+                    { text: "Hierarchia ta odzwierciedla fazy instalacyjne systemu: kompilacja wstępna kodu, prewencyjna defragmentacja sektorów dysku twardego, miękki reset instancji operacyjnej oraz właściwa instalacja środowiska graficznego.", isCorrect: false }
+                ]
+            },
+            {
+                question: "27. Podstawowe rodzaje aplikacji mobilnych",
+                flashcardAnswer: "Ze względu na technologię wykonania aplikacje mobilne klasyfikuje się w trzech nurtach:<ul><li><b>Aplikacje Natywne:</b> Tworzone w dedykowanym języku dla jednego środowiska (Swift/Objective-C dla iOS; Kotlin/Java dla Androida). Zapewniają najwyższą bezkompromisową wydajność, płynne UI oraz pełny, bezpośredni dostęp do sprzętu (kamera, sensory), ale wymagają pisania i utrzymywania dwóch oddzielnych kodów.</li><li><b>Aplikacje Webowe (PWA - Progressive Web Apps):</b> Strony internetowe stworzone w technologiach HTML/CSS/JS, zachowujące się jak aplikacje dzięki przeglądarce, responsywności i mechanizmom Service Workers. Nie wymagają instalacji przez sklepy, lecz ich zasięg uprawnień do sprzętu jest ograniczony.</li><li><b>Aplikacje Hybrydowe (Cross-platform):</b> Używają jednej współdzielonej bazy kodu kompilowanej lub renderowanej dla obu systemów (wykorzystują technologie webowe we wraperze np. Cordova, lub dedykowane frameworki jak React Native, Flutter). To ekonomiczny kompromis pomiędzy czasem wytwarzania a docelową wydajnością.</li></ul>",
+                testOptions: [
+                    { text: "Wyróżnia się trzy formy: aplikacje natywne (tworzone w dedykowanych językach systemowych, charakteryzujące się najwyższą wydajnością), aplikacje webowe (responsywne strony PWA uruchamiane w silniku przeglądarki) oraz aplikacje hybrydowe/wieloplatformowe (korzystające ze współdzielonej bazy kodu kompilowanej na różne systemy).", isCorrect: true },
+                    { text: "Na rynku mobilnym podział zacieśnia się wyłącznie do programów fabrycznie preinstalowanych na warstwie sprzętowej (firmware) oraz płatnych, zamkniętych systemów dystrybuowanych fizycznie z wykorzystaniem technologii optycznych.", isCorrect: false },
+                    { text: "Wyróżniamy jedynie archaiczne aplikacje wiersza poleceń uruchamiane w zamkniętym terminalu operatorskim oraz proste widżety, które nie wymagają ani nie obsługują jakichkolwiek dotykowych interfejsów graficznych.", isCorrect: false },
+                    { text: "Główne podziały na rynku określają aplikacje wytwarzane przez w pełni automatyczne mechanizmy sztucznej inteligencji, aplikacje testowe symulatorów oraz aplikacje sprzętowe generowane wprost z kodu binarnego płyty głównej przez inżynierów elektroniki.", isCorrect: false }
+                ]
+            },
+            {
+                question: "28. Pojęcie i istota sztucznej inteligencji oraz główne obszary zastosowania SI w badaniach społecznych",
+                flashcardAnswer: "<b>Pojęcie i istota:</b> Sztuczna inteligencja (AI) to dyscyplina inżynieryjna polegająca na budowie systemów wykazujących zdolności algorytmiczne przypisywane istotom rozumnym, takie jak uczenie się na danych, kategoryzacja, wnioskowanie, optymalizacja oraz rozpoznawanie skomplikowanych i wielowymiarowych wzorców.<br><b>Główne obszary zastosowania w naukach i badaniach społecznych:</b><ul><li><b>Analiza sentymentu i Przetwarzanie Języka Naturalnego (NLP):</b> Zautomatyzowane badanie i ocena emocji z potężnych zbiorów komentarzy, postów z mediów społecznościowych czy stenogramów wywiadów.</li><li><b>Rozszerzona segmentacja populacji:</b> Wykrywanie niewidocznych na pierwszy rzut oka korelacji statystycznych w gigantycznych danych demograficznych (Big Data).</li><li><b>Predykcja zachowań:</b> Modelowanie trendów społecznych i prawdopodobnych zachowań wyborczych lub rynkowych bez ścisłych sztywnych założeń (charakterystycznych dla prostej statystyki klasycznej).</li></ul>",
+                testOptions: [
+                    { text: "SI to interdyscyplinarna dziedzina zajmująca się algorytmami naśladującymi złożone funkcje poznawcze. W badaniach społecznych napędza analizę zjawisk na wielkich zbiorach danych, ewaluację emocji w wywiadach czy postach (NLP) oraz wyodrębnianie niejawnych korelacji statystycznych ułatwiających obiektywną segmentację i predykcje trendów.", isCorrect: true },
+                    { text: "Sztuczna inteligencja to mechanika polegająca na fizycznym i dosłownym zastępowaniu obywateli przez maszyny z metalu. W badaniach społecznych jest stosowana na wyłączność w urzędach statystycznych do weryfikacji i rutynowego mierzenia wzrostu oraz parametrów witalnych respondentów.", isCorrect: false },
+                    { text: "To zbiór klasycznych makr w środowisku MS Excel przeznaczonych jedynie do prostej, zautomatyzowanej arytmetyki dodawania liczb całkowitych w procesach finansowych podczas wywiadów ankietowych w korporacjach.", isCorrect: false },
+                    { text: "Zastosowanie systemów inteligentnych w socjologii drastycznie ogranicza się wyłącznie do bezobsługowego sterowania drukarkami, obsługi skanerów biurowych oraz zamykania plików tekstowych w systemach zarządzania serwerami uczelnianymi.", isCorrect: false }
+                ]
+            },
+            {
+                question: "29. Konstrukcja, podstawowe zasady działania, zalety i ograniczenia warstwowych i rekurencyjnych sztucznych sieci neuronowych",
+                flashcardAnswer: "Są to matematyczne struktury maszynowego uczenia wzorowane na systemie nerwowym.<ul><li><b>Sieci warstwowe jednokierunkowe (MLP/Feedforward):</b><br><i>Konstrukcja:</i> Sygnał przepływa ściśle liniowo (przód): wejście -> ukryte warstwy wag -> wyjście. Brak pamięci wstecznej.<br><i>Zalety i Ograniczenia:</i> Są uniwersalne do analizy i klasyfikacji izolowanych wektorów (np. obrazów), stosunkowo proste w trenowaniu gradientowym. Nie potrafią przetwarzać struktury czasu ani kontekstu danych sekwencyjnych (nie radzą sobie z ułożeniem słów w tekście).</li><li><b>Sieci rekurencyjne (RNN):</b><br><i>Konstrukcja:</i> Posiadają pętle sprzężenia zwrotnego. Stan węzłów przesyłany jest ponownie do własnych wejść w kolejnym kroku czasowym (tworzy się ukryty stan pamięci wewnętrznej).<br><i>Zalety i Ograniczenia:</i> Znakomite do danych o charakterze ciągłym (szeregi czasowe, przetwarzanie języka, tłumaczenia). Ograniczeniem i technologiczną wadą jest gubienie głębokich połączeń w czasie wynikające z matematycznego zanikania wektorów gradientu w trakcie propagacji (często zastępowane architekturami LSTM).</li></ul>",
+                testOptions: [
+                    { text: "Modele warstwowe charakteryzują się jednokierunkowym liniowym przepływem idealnym do analizy zjawisk statycznych bez wymiaru czasu. Sieci rekurencyjne implementują pętle sprzężeń i pamięć stanu, co pozwala na rzetelną pracę z danymi sekwencyjnymi (językiem, seriami danych), lecz borykają się z problemem matematycznego zanikania wektorów przy procesie uczenia.", isCorrect: true },
+                    { text: "Sieci warstwowe jednokierunkowe stanowią zamknięte bloki operujące tylko wokół wygenerowania interfejsów sprzętowych; podczas gdy sieci rekurencyjne są routerami fizycznymi wyposażonymi w porty LAN łączącymi topologie pierścieniowe w strukturach bezprzewodowych dla protokołu OSPF.", isCorrect: false },
+                    { text: "Zarówno infrastruktury MLP jak i RNN są u podstaw oparte niemal w stu procentach na statycznym wdrożeniu języka HTML i znajdują ograniczone korporacyjne wykorzystanie wyłącznie w generowaniu arkuszy CSS, co ogranicza ich moc poza procesorami graficznymi.", isCorrect: false },
+                    { text: "Modele rekursywne zaliczane są do najstarszych maszyn i uległy przedawnieniu z powodu kompletnego braku wewnętrznych mechanizmów utrzymania stanu pamięci, podczas gdy warstwowe układy transmitują prąd w modelu fizycznym z tyłu wyjścia do styków ramy komputera stacjonarnego.", isCorrect: false }
+                ]
+            },
+            {
+                question: "30. Metody ekonomicznej oceny przedsięwzięć informatycznych",
+                flashcardAnswer: "Narzędzia analityczne dla decydentów i interesariuszy umożliwiające rzetelne oszacowanie finansowych wymiarów wdrażania rozwiązań IT w środowisku przedsiębiorstwa.<br><b>Główne wskaźniki i metody:</b><ul><li><b>ROI (Return on Investment - Zwrot z inwestycji):</b> Klasyczny, procentowy wskaźnik rentowności, mierzący relację zysków w stosunku do poniesionych wydatków nakładowych.</li><li><b>TCO (Total Cost of Ownership - Całkowity koszt posiadania):</b> Identyfikuje nie tylko bezpośrednie i widoczne na fakturze nakłady zakupowe na licencje i sprzęt, ale agreguje trudne koszty wdrożeniowe, długoterminowe utrzymanie, administrację sieci oraz szkolenia kadr.</li><li><b>NPV (Net Present Value - Wartość zaktualizowana netto):</b> Wycena długoterminowa. Mierzy wartość przyszłych strumieni pieniężnych sprowadzając je do wartości dzisiejszej (uwzględniając upływ czasu i stopę dyskontową).</li><li><b>PP (Payback Period - Okres zwrotu):</b> Ocenia precyzyjny wymiar czasu, jakiego wymaga dana architektura IT by oszczędności pokryły całkowity kapitał początkowy.</li></ul>",
+                testOptions: [
+                    { text: "Należą do nich standardowe pomiary opłacalności systemów poprzez kluczowe wskaźniki takie jak ROI (poziom zwrotu kapitału z wdrożenia), analiza NPV (uwzględnienie różnicy wartości strumieni gotówki w czasie) oraz TCO (podliczenie niejawnego i stałego kosztu całego cyklu życia sprzętu i szkoleń).", isCorrect: true },
+                    { text: "Jedyną dopuszczalną pod względem ekonomicznym metodą jest czysto fizyczne, rygorystyczne podsumowanie prądu zużywanego w zasilaczach serwerowni i jego zestawienie z wagą użytego tworzywa sztucznego ze sprzętu zgromadzonego w placówkach firmy na rok obrachunkowy.", isCorrect: false },
+                    { text: "Podejście sprowadza ocenę przedsięwzięcia bezpośrednio do przeliczania zdeprecjonowanych bloków języka Java. Utrwalono zasadę wykazującą, że wprost proporcjonalne podniesienie liczby procedur przynosi liniowe zwroty w dziale sprzedaży hurtowej.", isCorrect: false },
+                    { text: "Wdrożono tu mechanizmy służące oszacowaniu potencjału w oparciu o statystykę logowania załogi; narzędziem ewaluacji rynkowej stała się ilość notyfikacji ze środowisk z testów, wykluczając jakąkolwiek asocjację z analizą kapitałową i planowanym procesem dyskontowym bazy.", isCorrect: false }
+                ]
+            },
+            
+        ];
+
+        // ==========================================
+        // LOGIKA WIDOKU I STEROWANIE
+        // ==========================================
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // ==========================================
+        // LOGIKA FISZEK
+        // ==========================================
+        let quizData = [...rawQuizData];
+        let currentFlashcardIndex = 0;
+        let isFlipped = false;
+
+        const flashcard = document.getElementById('flashcard');
+        const cardFront = document.getElementById('card-front');
+        const cardBack = document.getElementById('card-back');
+        const counter = document.getElementById('counter');
+
+        function loadCard() {
+            if(quizData.length === 0) return;
+            cardFront.innerHTML = quizData[currentFlashcardIndex].question;
+            cardBack.innerHTML = quizData[currentFlashcardIndex].flashcardAnswer;
+            counter.innerText = `${currentFlashcardIndex + 1} / ${quizData.length}`;
+            
+            if (isFlipped) {
+                flashcard.classList.remove('is-flipped');
+                isFlipped = false;
+            }
+            setTimeout(() => { cardFront.scrollTop = 0; cardBack.scrollTop = 0; }, 300);
+        }
+
+        function flipCard() { flashcard.classList.toggle('is-flipped'); isFlipped = !isFlipped; }
+
+        function nextCard() {
+            if (currentFlashcardIndex < quizData.length - 1) currentFlashcardIndex++;
+            else currentFlashcardIndex = 0;
+            if (isFlipped) { flipCard(); setTimeout(loadCard, 300); } else { loadCard(); }
+        }
+
+        function prevCard() {
+            if (currentFlashcardIndex > 0) currentFlashcardIndex--;
+            else currentFlashcardIndex = quizData.length - 1;
+            if (isFlipped) { flipCard(); setTimeout(loadCard, 300); } else { loadCard(); }
+        }
+
+        function shuffleDeck() { shuffleArray(quizData); currentFlashcardIndex = 0; loadCard(); }
+        function resetDeck() { quizData = [...rawQuizData]; currentFlashcardIndex = 0; loadCard(); }
+
+        // ==========================================
+        // OBSŁUGA KLAWIATURY
+        // ==========================================
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') { e.preventDefault(); flipCard(); }
+            else if (e.code === 'ArrowRight') { nextCard(); }
+            else if (e.code === 'ArrowLeft') { prevCard(); }
+        });
+
+        // Inicjalizacja pierwszej karty
+        loadCard();
+    </script>
+</body>
+</html>
